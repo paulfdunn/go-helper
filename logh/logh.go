@@ -1,5 +1,5 @@
 // Package logh is a GO package for leveled logging.
-// logh is hosted at https://github.com/paulfdunn/logh; please see the repo
+// logh is hosted at https://github.com/paulfdunn/go-helper/logh; please see the repo
 // for more information
 // Key features:
 //

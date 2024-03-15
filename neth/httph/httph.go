@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/paulfdunn/logh"
+	"github.com/paulfdunn/go-helper/logh"
 )
 
 // URLCollectionData - Functions that collect data from multiple URLs will return instance(s) of this
