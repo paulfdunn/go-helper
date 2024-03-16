@@ -3,6 +3,7 @@ package httph
 import (
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -13,7 +14,26 @@ import (
 	"time"
 
 	"github.com/paulfdunn/go-helper/logh"
+	"github.com/paulfdunn/go-helper/osh/runtimeh"
 )
+
+// BodyUnmarshal - Unmarshalls a request body (JSON) into an object.
+func BodyUnmarshal(w http.ResponseWriter, r *http.Request, obj interface{}) error {
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return runtimeh.SourceInfoError("reading body", err)
+	}
+
+	err = json.Unmarshal(body, &obj)
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return runtimeh.SourceInfoError("unmarshal body", err)
+	}
+
+	return nil
+}
 
 // URLCollectionData - Functions that collect data from multiple URLs will return instance(s) of this
 // structure, in order to allow association of URL, Byte (data), and errors.

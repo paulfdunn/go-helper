@@ -1,6 +1,4 @@
 // Package databaseh provides a kvs for sqlite3.
-// databaseh is hosted at https://github.com/paulfdunn/go-helper/databaseh; please see the repo
-// for more information
 package databaseh
 
 import (

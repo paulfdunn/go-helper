@@ -1,4 +1,4 @@
 github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o4kU=
 github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
-github.com/paulfdunn/go-helper/osh v1.0.3 h1:is9m3A9PXJWMHGXioRgFJezJmDLDmIA8gCaaoR9rPjg=
-github.com/paulfdunn/go-helper/osh v1.0.3/go.mod h1:fxQ/0oHwpkKqGOWu0rGRvWGFU2B7kiXq8Mux/1E2LXE=
+github.com/paulfdunn/go-helper/osh v1.0.6 h1:6eSDBdgoDv8+2OwvoTKhY1FQOH30KR7a9CUfd0GGBm0=
+github.com/paulfdunn/go-helper/osh v1.0.6/go.mod h1:fxQ/0oHwpkKqGOWu0rGRvWGFU2B7kiXq8Mux/1E2LXE=
