@@ -3,6 +3,7 @@ go 1.21.7
 use (
 	.
 	./cryptoh
+	./databaseh
 	./encodingh
 	./logh
 	./mathh
