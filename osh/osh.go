@@ -9,11 +9,11 @@ import (
 // DirIsEmpty returns true if the directory exists and is empty.
 func DirIsEmpty(path string) (bool, error) {
 	f, err := os.Open(path)
-	defer f.Close()
 	if err != nil {
 		// Return false if the directory does not exist.
 		return false, err
 	}
+	defer f.Close()
 
 	// Readdirnames does NOT return "." and ".."; so a single file indicates the dir
 	// is not empty.

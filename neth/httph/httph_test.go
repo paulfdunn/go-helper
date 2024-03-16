@@ -132,8 +132,6 @@ func TestRequestUsername(t *testing.T) {
 
 	if reqUser != "testUser" {
 		t.Errorf("User was not correct, reqUser:%+v", reqUser)
-	} else {
-		//fmt.Printf("User was:%+v", reqUser)
 	}
 }
 
