@@ -2,7 +2,4 @@ module github.com/paulfdunn/go-helper/neth
 
 go 1.21.7
 
-require (
-	github.com/paulfdunn/go-helper/logh v1.0.7
-	github.com/paulfdunn/go-helper/osh v1.0.6
-)
+require github.com/paulfdunn/go-helper/osh v1.0.7

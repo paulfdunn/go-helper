@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/paulfdunn/go-helper/logh"
 	"github.com/paulfdunn/go-helper/osh/runtimeh"
 )
 
@@ -44,18 +43,13 @@ type URLCollectionData struct {
 	Err      error
 }
 
-const (
-	appName = "quant"
-)
-
 // CollectURL - Pass in a URL, request timeout, HTTP method to use, and get back
 // the body of the request. HTTP method MUST be one of: [MethodGet, MethodHead]
 func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *http.Response, error) {
 	var req *http.Request
 	u, err := url.Parse(urlIn)
 	if err != nil {
-		logh.Map[appName].Printf(logh.Error, "CollectURL error parsing urlIn:%v", err)
-		return []byte{}, nil, err
+		return []byte{}, nil, runtimeh.SourceInfoError("error parsing urlIn", err)
 	}
 
 	var reqErr error
@@ -65,14 +59,11 @@ func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *ht
 	case http.MethodHead:
 		req, reqErr = http.NewRequest(http.MethodHead, u.String(), nil)
 	default:
-		err := fmt.Errorf("invalid method: %s", method)
-		logh.Map[appName].Printf(logh.Error, "%v", err)
-		return nil, nil, err
+		return nil, nil, runtimeh.SourceInfoError("", fmt.Errorf("invalid method: %s", method))
 	}
 
 	if reqErr != nil {
-		logh.Map[appName].Printf(logh.Error, "Error creating http.Request:%+v", reqErr)
-		return nil, nil, reqErr
+		return nil, nil, runtimeh.SourceInfoError("Error creating http.Request", reqErr)
 	}
 	req.Header.Set("Connection", "close")
 	req.Close = true
@@ -86,9 +77,7 @@ func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *ht
 	client := http.Client{Timeout: timeout, Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		// Warning level, as the IP/host may be invalid, host down, etc.
-		logh.Map[appName].Printf(logh.Warning, "CollectURL client error:%v", err)
-		return []byte{}, resp, err
+		return []byte{}, resp, runtimeh.SourceInfoError("CollectURL client error", err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
@@ -131,7 +120,6 @@ func CollectURLs(urls []string, timeout time.Duration, method string, threads in
 	close(workerOut)
 	for r := range workerOut {
 		returnData = append(returnData, r)
-		logh.Map[appName].Printf(logh.Debug, "CollectURLs url:%v, error:%v", r.URL, r.Err)
 	}
 
 	return returnData
