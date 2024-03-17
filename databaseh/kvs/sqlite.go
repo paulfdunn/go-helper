@@ -16,6 +16,7 @@ type KVS struct {
 }
 
 // New creates a new key/value store, with a new or existing table, in the database for key/value storage.
+// The database file is created if it does not exist; an existing file is used if present.
 // The returned object has a single connection. If performance is an issue, create a pool of connections.
 // The GO sql package insures single threaded access to the connection, and thus it is thread safe.
 func New(dbConnectionString string, table string) (KVS, error) {

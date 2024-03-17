@@ -42,6 +42,13 @@ func TestDeleteGetSet(t *testing.T) {
 		return
 	}
 
+	// Close and re-open to show that New will open an existing database.
+	kvs.Close()
+	kvs, err = New(dataSourceName, table)
+	if err != nil {
+		t.Errorf("New, error: %v", err)
+	}
+
 	if count, err := kvs.Delete("k2"); count != 1 || err != nil {
 		t.Errorf("deleting key, error: %v", err)
 		return

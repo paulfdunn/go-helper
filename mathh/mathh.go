@@ -1,3 +1,4 @@
+// Package mathh provides helper functions for the math package.
 package mathh
 
 import "math"

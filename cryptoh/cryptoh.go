@@ -1,3 +1,4 @@
+// Package cryptoh provides helper functions for the crypto package.
 package cryptoh
 
 import (

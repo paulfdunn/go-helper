@@ -1,3 +1,4 @@
+// Package httph provides helper functions for the net/http package.
 package httph
 
 import (

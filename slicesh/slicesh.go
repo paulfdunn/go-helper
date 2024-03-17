@@ -1,3 +1,4 @@
+// Package slicesh provides helper functions for the slices package.
 package slicesh
 
 import "fmt"

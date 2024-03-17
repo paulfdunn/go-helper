@@ -1,3 +1,4 @@
+// Package jsonh provides helper functions for the encoding/json package.
 package jsonh
 
 import "regexp"
