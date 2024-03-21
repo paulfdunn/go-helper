@@ -1,27 +1,33 @@
 package cryptoh
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+)
 
-func ExampleMD5ChecksumBase64() {
-	fmt.Printf("%s", MD5ChecksumBase64([]byte("admin:Western Digital Corporation:admin")))
-	// Output:
-	// l+uthS0Nq/1rca4m//Yfow==
+var (
+	testDir string
+)
+
+func init() {
+	t := testing.T{}
+	testDir = t.TempDir()
 }
 
-func ExampleMD5Checksum() {
-	fmt.Printf("% 02x", MD5Checksum([]byte("admin:Western Digital Corporation:admin")))
-	// Output:
-	// 97 eb ad 85 2d 0d ab fd 6b 71 ae 26 ff f6 1f a3
-}
+// ExampleSha256FileHash is an example of computing a SHA256 hash on a file.
+// Verify the value by stopping the code in the debugger generating the hash:
+// shasum -a 256 <testFilePath>
+func ExampleSha256FileHash() {
+	testFilePath := filepath.Join(testDir, "testHash.txt")
+	os.WriteFile(testFilePath, []byte("this is a test"), 0644)
+	hash, err := Sha256FileHash(testFilePath)
+	if err != nil {
+		fmt.Println("Error getting hash....")
+	}
+	fmt.Printf("%x", hash)
 
-func ExampleSHA1ChecksumBase64() {
-	fmt.Printf("%s", SHA1ChecksumBase64([]byte("admin")))
 	// Output:
-	// 0DPiKuNIrrVmD8IUCuw1hQxNqZc=
-}
-
-func ExampleSHA1Checksum() {
-	fmt.Printf("% 02x", SHA1Checksum([]byte("admin")))
-	// Output:
-	// d0 33 e2 2a e3 48 ae b5 66 0f c2 14 0a ec 35 85 0c 4d a9 97
+	// 2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c
 }

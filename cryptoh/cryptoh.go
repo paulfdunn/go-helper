@@ -2,29 +2,29 @@
 package cryptoh
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
-	"encoding/base64"
+	"crypto/sha256"
+	"fmt"
+	"io"
+	"os"
 )
 
-// MD5Checksum provides a []byte with the MD5 hash (checksum) for the input.
-func MD5Checksum(input []byte) [16]byte {
-	return md5.Sum(input)
-}
+// Sha256FileHash computes the sha256 of the input file.
+func Sha256FileHash(filePath string) ([]byte, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
 
-// MD5ChecksumBase64 provides a string with the MD5 hash (checksum) in base64 for the input.
-func MD5ChecksumBase64(input []byte) string {
-	s := MD5Checksum(input)
-	return base64.StdEncoding.EncodeToString(s[:])
-}
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return nil, err
+	}
 
-// SHA1Checksum provides a []byte with the MD5 hash (checksum) for the input.
-func SHA1Checksum(input []byte) [20]byte {
-	return sha1.Sum(input)
-}
+	out := h.Sum(nil)
+	if len(out) != 32 {
+		return nil, fmt.Errorf("hash is incorrect length")
+	}
 
-// SHA1ChecksumBase64 provides a string with the MD5 hash (checksum) in base64 for the input.
-func SHA1ChecksumBase64(input []byte) string {
-	s := SHA1Checksum(input)
-	return base64.StdEncoding.EncodeToString(s[:])
+	return out, nil
 }
