@@ -1,6 +1,6 @@
 #!/bin/bash
-VERSION="v1.1.0"
-NEXT_VERSION="v1.2.0"
+VERSION="v1.3.0"
+NEXT_VERSION="v1.4.0"
 
 git add -A
 git commit $1
@@ -21,21 +21,21 @@ git push origin --tags
 cd archiveh
 go get -u github.com/paulfdunn/go-helper/cryptoh@"${VERSION}"
 go get -u github.com/paulfdunn/go-helper/testingh@"${VERSION}"
-git tag archiveh/"${NEXT_VERSION}"
 cd ../
 
 cd databaseh
 go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
-git tag archiveh/"${NEXT_VERSION}"
 cd ../
 
 cd neth
 go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
-git tag archiveh/"${NEXT_VERSION}"
 cd ../
 
 git add -A
 git commit -m 'Update packages with dependencies'
 git push origin
+git tag archiveh/"${NEXT_VERSION}"
+git tag archiveh/"${NEXT_VERSION}"
+git tag archiveh/"${NEXT_VERSION}"
 git push origin --tags
 
