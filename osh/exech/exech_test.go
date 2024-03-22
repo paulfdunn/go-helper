@@ -14,14 +14,14 @@ type testExecArgs struct {
 	testStderr string
 }
 
-func TestExecCommandAndShell(t *testing.T) {
-	commonTests(t, ExecCommand)
-	commonTests(t, ExecShell)
+func TestExecCommandContextAndShell(t *testing.T) {
+	commonTests(t, ExecCommandContext)
+	commonTests(t, ExecShellContext)
 }
 
-func TestExecCommandWithPipe(t *testing.T) {
+func TestExecCommandContextWithPipe(t *testing.T) {
 	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
-	// (ExecShell is required for pipes or other shell supported functions.)
+	// (ExecShellContext is required for pipes or other shell supported functions.)
 	var stdout, stderr bytes.Buffer
 	tea := testExecArgs{
 		ExecArgs: ExecArgs{
@@ -34,9 +34,9 @@ func TestExecCommandWithPipe(t *testing.T) {
 		testStdout: "this is stdout 1>&2",
 		testStderr: "",
 	}
-	rc, err := ExecCommand(&tea.ExecArgs)
+	rc, err := ExecCommandContext(&tea.ExecArgs)
 	if err != nil {
-		t.Errorf("Error calling ExecCommand: %+v", err)
+		t.Errorf("Error calling ExecCommandContext: %+v", err)
 	}
 	// STDOUT comes back with a trailing \n
 	se := strings.TrimSpace(stderr.String())
@@ -46,9 +46,9 @@ func TestExecCommandWithPipe(t *testing.T) {
 	}
 }
 
-func TestExecShellWithPipe(t *testing.T) {
+func TestExecShellContextWithPipe(t *testing.T) {
 	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
-	// (ExecShell is required for pipes or other shell supported functions.)
+	// (ExecShellContext is required for pipes or other shell supported functions.)
 	var stdout, stderr bytes.Buffer
 	tea := testExecArgs{
 		ExecArgs: ExecArgs{
@@ -61,9 +61,9 @@ func TestExecShellWithPipe(t *testing.T) {
 		testStdout: "",
 		testStderr: "this is stdout",
 	}
-	rc, err := ExecShell(&tea.ExecArgs)
+	rc, err := ExecShellContext(&tea.ExecArgs)
 	if err != nil {
-		t.Errorf("Error calling ExecCommand: %+v", err)
+		t.Errorf("Error calling ExecCommandContext: %+v", err)
 	}
 	// STDOUT comes back with a trailing \n
 	se := strings.TrimSpace(stderr.String())
