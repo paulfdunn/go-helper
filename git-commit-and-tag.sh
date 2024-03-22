@@ -1,15 +1,19 @@
 #!/bin/bash
-VERSION="v1.3.2"
-NEXT_VERSION="v1.4.2"
+# Update VERSION and VERSION_WITH_DEPENDENCIES, then run to update update the repo (local and remote)
+# with the tags. Accepts a quotes string for the commit message
+# Note that the versioning scheme is that with no interdependencies get the odd minor version, then
+# packages with interdependencies get the next higher even version.
+VERSION="v1.3.3"
+VERSION_WITH_DEPENDENCIES="v1.4.3"
 
 git add -A
 git commit -m "{$1}"
 git push origin
 
-git tag archiveh/"${VERSION}"
+# git tag archiveh/"${VERSION}"    HAS DEPENDENCY
 git tag cryptoh/"${VERSION}"
-git tag databaseh/"${VERSION}"
-git tag encodingh/"${VERSION}"
+# git tag databaseh/"${VERSION}"    HAS DEPENDENCY
+# git tag encodingh/"${VERSION}"    HAS DEPENDENCY
 git tag logh/"${VERSION}"
 git tag mathh/"${VERSION}"
 git tag neth/"${VERSION}"
@@ -35,8 +39,8 @@ cd ../
 git add -A
 git commit -m 'Update packages with dependencies'
 git push origin
-git tag archiveh/"${NEXT_VERSION}"
-git tag databaseh/"${NEXT_VERSION}"
-git tag neth/"${NEXT_VERSION}"
+git tag archiveh/"${VERSION_WITH_DEPENDENCIES}"
+git tag databaseh/"${VERSION_WITH_DEPENDENCIES}"
+git tag neth/"${VERSION_WITH_DEPENDENCIES}"
 git push origin --tags
 
