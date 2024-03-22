@@ -1,3 +1,4 @@
+#!/bin/bash
 VERSION="v1.1.0"
 NEXT_VERSION="v1.2.0"
 
@@ -34,7 +35,7 @@ git tag archiveh/"${NEXT_VERSION}"
 cd ../
 
 git add -A
-git commit $1
+git commit -m 'Update packages with dependencies'
 git push origin
 git push origin --tags
 
