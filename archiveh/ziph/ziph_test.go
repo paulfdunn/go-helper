@@ -13,8 +13,8 @@ import (
 	"github.com/paulfdunn/go-helper/testingh"
 )
 
-// TestZipUnzipShaCompare tests a round trip operation of creating a files, zipping, unzipping
-// and comparing the checksum of the input and unzipped files.
+// TestZipUnzipShaCompare tests a round trip operation of creating a files, zipping,
+// checking GetZipStats, unzipping, and comparing the checksum of the input and unzipped files.
 func TestZipUnzipShaCompare(t *testing.T) {
 	// Create test input files.
 	testFileDir := t.TempDir()
@@ -62,16 +62,49 @@ func TestZipUnzipShaCompare(t *testing.T) {
 		}
 	}
 
-	// Test AsyncZip outputs.
-	if pathCount != len(testFilePaths) || errCount != 0 {
-		t.Errorf("pathCount: %d, errCount: %d", pathCount, errCount)
+	// Test gitZipStats
+	n, err := GetZipStats(zipFilePath)
+	if n.FileCount != len(testFilePaths) || err != nil {
+		t.Errorf("gitZipStats issue, n: %d, err: +%v", n, err)
 	}
 
-	// Unzip the files into a new TempDir
+	// Test AsyncZip outputs.
+	if pathCount != len(testFilePaths) || errCount != 0 {
+		t.Errorf("AsyncZip pathCount: %d, errCount: %d", pathCount, errCount)
+	}
+
+	// AsyncUnzip the files into a new TempDir
 	unzipDir := t.TempDir()
-	err = Unzip(zipFilePath, unzipDir, 0755)
-	if err != nil {
-		t.Errorf("unzip error: %+v", err)
+	done, processedPaths, errs = AsyncUnzip(zipFilePath, unzipDir, 0755)
+	dn = false
+	pathCount = 0
+	errCount = 0
+	for {
+		noMessage := false
+		select {
+		case dn = <-done:
+			fmt.Printf("done: %t\n", dn)
+		case pp := <-processedPaths:
+			pathCount++
+			fmt.Printf("processed path: %s\n", pp)
+		case err := <-errs:
+			errCount++
+			fmt.Printf("error: %v\n", err)
+		default:
+			noMessage = true
+		}
+
+		if noMessage {
+			if dn {
+				break
+			}
+			time.Sleep(time.Second)
+		}
+	}
+
+	// Test AsyncUnzip outputs.
+	if pathCount != len(testFilePaths) || errCount != 0 {
+		t.Errorf("AsyncUnzip pathCount: %d, errCount: %d", pathCount, errCount)
 	}
 
 	// Compare the hashes of the input files to the output files.

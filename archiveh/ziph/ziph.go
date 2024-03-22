@@ -11,19 +11,72 @@ import (
 	"strings"
 )
 
+// ZipStats is for getting statistics on a zip file; currently only
+// supports the number of zip.File in an archive.
+type ZipStats struct {
+	FileCount int
+}
+
+// AsyncUnzip asynchronously unzips inputPath to outputPath; outputPath will be
+// created if it does not exist. Directories are created with permDir permissions.
+// Progress can be monitored via the returned channels, which return done, processed
+// paths, and any errors. The done channel will fire once when work is done.
+func AsyncUnzip(inputPath, outputPath string, permDir os.FileMode) (<-chan bool, <-chan string, <-chan error) {
+	zs, err := GetZipStats(inputPath)
+	if err != nil {
+		// If GetZipStats failed, just set buffer lengths to 1 because the zip.OpenReader
+		// will fail again below and return.
+		zs.FileCount = 1
+	}
+	done := make(chan bool, 1)
+	// Size channels so that they don't block if the caller is only checking done.
+	processedPaths := make(chan string, zs.FileCount)
+	errors := make(chan error, zs.FileCount)
+	go func() {
+		zr, err := zip.OpenReader(inputPath)
+		if err != nil {
+			done <- true
+			errors <- err
+			return
+		}
+		defer zr.Close()
+
+		outputPath, err = filepath.Abs(outputPath)
+		if err != nil {
+			done <- true
+			errors <- err
+			return
+		}
+
+		for _, f := range zr.File {
+			err := removeFromZip(f, outputPath, permDir)
+			processedPaths <- outputPath
+			if err != nil {
+				done <- true
+				errors <- err
+				return
+			}
+		}
+		done <- true
+	}()
+
+	return done, processedPaths, errors
+}
+
 // AsyncZip asynchronously creates a compressed ZIP file, of file/directories
 // in paths, at zipPath. The paths are turned into absolute paths, then made
 // relative by removing the leading filepath.Separator.
 // Progress can be monitored via the returned channels, which return done, processed
 // paths, and any errors. The done channel will fire once when work is done.
-func AsyncZip(zipPath string, paths []string) (<-chan bool,
-	<-chan string, <-chan error) {
+func AsyncZip(zipPath string, paths []string) (<-chan bool, <-chan string, <-chan error) {
 	done := make(chan bool, 1)
+	// Size channels so that they don't block if the caller is only checking done.
 	processedPaths := make(chan string, len(paths))
 	errors := make(chan error, len(paths))
 	go func() {
 		f, err := os.Create(zipPath)
 		if err != nil {
+			done <- true
 			errors <- err
 			return
 		}
@@ -36,6 +89,7 @@ func AsyncZip(zipPath string, paths []string) (<-chan bool,
 			err := filepath.WalkDir(path, addToZip(zipWriter))
 			processedPaths <- path
 			if err != nil {
+				done <- true
 				errors <- err
 			}
 		}
@@ -46,28 +100,20 @@ func AsyncZip(zipPath string, paths []string) (<-chan bool,
 	return done, processedPaths, errors
 }
 
-// Unzip unzips inputPath to outputPath; outputPath will be created if it does not exist.
-// Directories are created with permDir permissions.
-func Unzip(inputPath, outputPath string, permDir os.FileMode) error {
+// GetZipStats is for getting statistics on a zip file; currently only
+// supports the number of zip.File in an archive.
+func GetZipStats(inputPath string) (*ZipStats, error) {
 	zr, err := zip.OpenReader(inputPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer zr.Close()
 
-	outputPath, err = filepath.Abs(outputPath)
-	if err != nil {
-		return err
+	zs := ZipStats{FileCount: 0}
+	for range zr.File {
+		zs.FileCount++
 	}
-
-	for _, f := range zr.File {
-		err := removeFromZip(f, outputPath, permDir)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return &zs, nil
 }
 
 // addToZip is a closure called by Create to add a directory or file to the zipWriter;
@@ -123,8 +169,10 @@ func addToZip(zipWriter *zip.Writer) func(string, fs.DirEntry, error) error {
 // for Zip Slip (https://github.com/golang/go/issues/40373) and an error is returned for
 // inappropriate paths.
 func removeFromZip(zipFile *zip.File, outputPath string, permDir os.FileMode) error {
+	// zipFile.Name is a relative path and file name
 	outputFilePath := filepath.Join(outputPath, zipFile.Name)
-	// Reject paths that might Zip Slip
+	// Reject paths that might Zip Slip; I.E. if zipFile.Name uses ../ to access
+	// directories outside outputPath the file is rejected.
 	if !strings.HasPrefix(outputFilePath, filepath.Clean(outputPath)+string(os.PathSeparator)) {
 		return fmt.Errorf("removeFromZip invalid file path: %s", outputFilePath)
 	}
