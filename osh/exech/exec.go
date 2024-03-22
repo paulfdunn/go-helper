@@ -2,8 +2,9 @@
 package exech
 
 import (
-	"bytes"
+	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -19,35 +20,43 @@ var (
 	Shell = []string{"sh", "-c"}
 )
 
-// ExecCommand wraps os.exec to provide a function that returns: stdout, stderr, rc, err.
-func ExecCommand(name string, args []string) (string, string, int, error) {
-	cmd := exec.Command(name, args...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+type ExecArgs struct {
+	Args    []string
+	Command string
+	Context context.Context
+	Stderr  io.Writer
+	Stdout  io.Writer
+}
+
+// ExecCommandContext wraps os.exec.CommandContext to provide a function that returns: stdout, stderr, rc, err.
+// This is a blocking call that only returns when the command completes.
+// Callers that don't want to provide a context can pass in `context.TODO()`
+func ExecCommandContext(execArgs *ExecArgs) (int, error) {
+	cmd := exec.CommandContext(execArgs.Context, execArgs.Command, execArgs.Args...)
+	cmd.Stderr = execArgs.Stderr
+	cmd.Stdout = execArgs.Stdout
 	err := cmd.Run()
 	if err != nil {
-		rerr := runtimeh.SourceInfoError(fmt.Sprintf("ExecCommand Run error: %s", stderr.String()), err)
+		rerr := runtimeh.SourceInfoError(fmt.Sprintf("ExecCommandContext Run error"), err)
 		rc := ErrorWithNoReturnCode
 		if exitError, ok := err.(*exec.ExitError); ok {
 			rc = exitError.Sys().(syscall.WaitStatus).ExitStatus()
 		}
-		return "", "", rc, rerr
+		return rc, rerr
 	}
-	so := stdout.String()
-	se := stderr.String()
-	return so, se, 0, nil
+	return 0, nil
 }
 
-// ExecCommand wraps os.exec to provide a function runs in a shell and
+// ExecShellContext wraps os.exec.CommandContext to provide a function that runs in a shell and
 // that returns: stdout, stderr, rc, err.
-func ExecShell(cmd string, args []string) (string, string, int, error) {
-	var nargs []string
-	cmdString := cmd + " " + strings.Join(args, " ")
+// Callers that don't want to provide a context can pass in `context.TODO()`
+func ExecShellContext(execArgs *ExecArgs) (int, error) {
+	cmdString := execArgs.Command + " " + strings.Join(execArgs.Args, " ")
 	if len(Shell) > 1 {
-		nargs = append(Shell[1:], cmdString)
+		execArgs.Args = append(Shell[len(Shell)-1:], cmdString)
 	} else {
-		nargs = []string{cmdString}
+		execArgs.Args = []string{cmdString}
 	}
-	return ExecCommand(Shell[0], nargs)
+	execArgs.Command = Shell[0]
+	return ExecCommandContext(execArgs)
 }

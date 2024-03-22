@@ -1,64 +1,144 @@
 package exech
 
 import (
+	"bytes"
+	"context"
 	"strings"
 	"testing"
+	"time"
 )
 
-func TestExecCommand(t *testing.T) {
-	var cmd, testStdout, testStderr string
-	cmd = "echo"
-	testStdout = "this is stdout"
-	testStderr = ""
-	so, se, rc, err := ExecCommand(cmd, []string{testStdout})
-	// STDOUT comes back with a trailing \n
-	if strings.TrimSpace(so) != testStdout || strings.TrimSpace(se) != testStderr || rc != 0 || err != nil {
-		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
-	}
+type testExecArgs struct {
+	ExecArgs
+	testStdout string
+	testStderr string
+}
 
-	// Verify pipe does not work and the string goes to STDOUT
-	cmd = "echo"
-	testStdout = "this is stdout; echo this is stderr 1>&2"
-	testStderr = ""
-	so, se, rc, err = ExecCommand(cmd, []string{testStdout})
-	// STDOUT comes back with a trailing \n
-	if strings.TrimSpace(so) != testStdout || strings.TrimSpace(se) != testStderr || rc != 0 || err != nil {
-		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
-	}
+func TestExecCommandAndShell(t *testing.T) {
+	commonTests(t, ExecCommandContext)
+	commonTests(t, ExecShellContext)
+}
 
-	cmd = "echo-blah"
-	testStdout = "this is stdout"
-	testStderr = ""
-	so, se, rc, err = ExecCommand(cmd, []string{testStdout})
-	if rc == 0 || err == nil {
+func TestExecCommandWithPipe(t *testing.T) {
+	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
+	// (ExecShellContext is required for pipes or other shell supported functions.)
+	var stdout, stderr bytes.Buffer
+	tea := testExecArgs{
+		ExecArgs: ExecArgs{
+			Args:    []string{"this is stdout 1>&2"},
+			Context: context.TODO(),
+			Command: "echo",
+			Stderr:  &stderr,
+			Stdout:  &stdout,
+		},
+		testStdout: "this is stdout 1>&2",
+		testStderr: "",
+	}
+	rc, err := ExecCommandContext(&tea.ExecArgs)
+	if err != nil {
+		t.Errorf("Error calling ExecCommandContext: %+v", err)
+	}
+	// STDOUT comes back with a trailing \n
+	se := strings.TrimSpace(stderr.String())
+	so := strings.TrimSpace(stdout.String())
+	if se != tea.testStderr || strings.TrimSpace(so) != tea.testStdout || rc != 0 || err != nil {
 		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
 	}
 }
 
-func TestExecShell(t *testing.T) {
-	var cmd, testStdout, testStderr string
-	cmd = "echo this is stdout"
-	testStdout = "this is stdout"
-	testStderr = ""
-	so, se, rc, err := ExecShell(cmd, []string{})
+func TestExecShellWithPipe(t *testing.T) {
+	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
+	// (ExecShellContext is required for pipes or other shell supported functions.)
+	var stdout, stderr bytes.Buffer
+	tea := testExecArgs{
+		ExecArgs: ExecArgs{
+			Args:    []string{"this is stdout 1>&2"},
+			Context: context.TODO(),
+			Command: "echo",
+			Stderr:  &stderr,
+			Stdout:  &stdout,
+		},
+		testStdout: "",
+		testStderr: "this is stdout",
+	}
+	rc, err := ExecShellContext(&tea.ExecArgs)
+	if err != nil {
+		t.Errorf("Error calling ExecCommandContext: %+v", err)
+	}
 	// STDOUT comes back with a trailing \n
-	if strings.TrimSpace(so) != testStdout || strings.TrimSpace(se) != testStderr || rc != 0 || err != nil {
+	se := strings.TrimSpace(stderr.String())
+	so := strings.TrimSpace(stdout.String())
+	if se != tea.testStderr || strings.TrimSpace(so) != tea.testStdout || rc != 0 || err != nil {
+		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
+	}
+}
+
+func commonTests(t *testing.T, testFunc func(*ExecArgs) (int, error)) {
+	var stdout, stderr bytes.Buffer
+	tea := testExecArgs{
+		ExecArgs: ExecArgs{
+			Args:    []string{"this is stdout"},
+			Context: context.TODO(),
+			Command: "echo",
+			Stderr:  &stderr,
+			Stdout:  &stdout,
+		},
+		testStdout: "this is stdout",
+		testStderr: "",
+	}
+	rc, err := testFunc(&tea.ExecArgs)
+	if err != nil {
+		t.Errorf("Error calling testFunc: %+v", err)
+	}
+	// STDOUT comes back with a trailing \n
+	se := strings.TrimSpace(stderr.String())
+	so := strings.TrimSpace(stdout.String())
+	if se != tea.testStderr || strings.TrimSpace(so) != tea.testStdout || rc != 0 || err != nil {
 		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
 	}
 
-	cmd = "echo this is stderr 1>&2"
-	testStdout = ""
-	testStderr = "this is stderr"
-	so, se, rc, err = ExecShell(cmd, []string{})
+	// Show that a timeout works to stop a command.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1)*time.Second)
+	defer cancel()
+	stdout.Truncate(0)
+	stderr.Truncate(0)
+	tea = testExecArgs{
+		ExecArgs: ExecArgs{
+			Args:    []string{"60"},
+			Context: ctx,
+			Command: "sleep",
+			Stderr:  &stderr,
+			Stdout:  &stdout,
+		},
+		testStdout: "this is stdout 1>&2",
+		testStderr: "",
+	}
+	rc, err = testFunc(&tea.ExecArgs)
 	// STDOUT comes back with a trailing \n
-	if strings.TrimSpace(so) != testStdout || strings.TrimSpace(se) != testStderr || rc != 0 || err != nil {
+	se = strings.TrimSpace(stderr.String())
+	so = strings.TrimSpace(stdout.String())
+	if rc == 0 || err == nil {
 		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
 	}
 
-	cmd = "echo-blah this is stderr 1>&2"
-	testStdout = ""
-	testStderr = "this is stderr"
-	so, se, rc, err = ExecShell(cmd, []string{})
+	// Negative test with a bad command
+	stdout.Truncate(0)
+	stderr.Truncate(0)
+	tea = testExecArgs{
+		ExecArgs: ExecArgs{
+			Args:    []string{"this is stdout"},
+			Context: context.TODO(),
+			Command: "echo-blah",
+			Stderr:  &stderr,
+			Stdout:  &stdout,
+		},
+		testStdout: "",
+		testStderr: "",
+	}
+	rc, err = testFunc(&tea.ExecArgs)
+	// STDOUT comes back with a trailing \n
+	se = strings.TrimSpace(stderr.String())
+	so = strings.TrimSpace(stdout.String())
 	if rc == 0 || err == nil {
 		t.Errorf("echo failed, so: %s, se: %s, rc: %d, err: %v", so, se, rc, err)
 	}
