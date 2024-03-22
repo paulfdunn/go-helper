@@ -10,5 +10,6 @@ use (
 	./mathh
 	./neth
 	./osh
+	./slicesh
 	./testingh
 )
