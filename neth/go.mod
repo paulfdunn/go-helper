@@ -1,13 +1,10 @@
 module github.com/paulfdunn/go-helper/neth
 
-go 1.21.7
-
-toolchain go1.21.8
+go 1.21.8
 
 require github.com/paulfdunn/go-helper/osh v1.0.14
 
 retract [v1.0.0, v1.0.20]
-
 // retract neth/v1.0.0
 // retract neth/v1.0.1
 // retract neth/v1.0.2
