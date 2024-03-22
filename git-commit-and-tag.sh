@@ -1,6 +1,6 @@
 #!/bin/bash
-VERSION="v1.3.1"
-NEXT_VERSION="v1.4.1"
+VERSION="v1.3.2"
+NEXT_VERSION="v1.4.2"
 
 git add -A
 git commit -m "{$1}"
@@ -16,6 +16,7 @@ git tag neth/"${VERSION}"
 git tag osh/"${VERSION}"
 git tag slicesh/"${VERSION}"
 git tag testingh/"${VERSION}"
+
 git push origin --tags
 
 cd archiveh
