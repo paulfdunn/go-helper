@@ -3,8 +3,8 @@
 # with the tags. Accepts a quotes string for the commit message
 # Note that the versioning scheme is that with no interdependencies get the odd minor version, then
 # packages with interdependencies get the next higher even version.
-VERSION="v1.3.5"
-VERSION_WITH_DEPENDENCIES="v1.4.5"
+VERSION="v1.3.6"
+VERSION_WITH_DEPENDENCIES="v1.4.6"
 
 git add -A
 git commit -m "{$1}"
@@ -29,11 +29,11 @@ go get -u github.com/paulfdunn/go-helper/testingh@"${VERSION}"
 cd ../
 
 cd databaseh
-go get -u github.com/paulfdunn/go-helper/databaseh@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
 cd ../
 
 cd neth
-go get -u github.com/paulfdunn/go-helper/neth@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
 cd ../
 
 git add -A
