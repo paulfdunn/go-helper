@@ -1,5 +1,5 @@
-// Package kvs implements a key/value store. These functions provide for object
-// serialization/deserialization to the kvs.
+// Package kvs implements a key/value store. These functions provide for
+// object serialization/deserialization to the kvs.
 package kvs
 
 import (
