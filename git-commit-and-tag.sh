@@ -3,8 +3,8 @@
 # with the tags. Accepts a quotes string for the commit message
 # Note that the versioning scheme is that with no interdependencies get the odd minor version, then
 # packages with interdependencies get the next higher even version.
-VERSION="v1.3.7"
-VERSION_WITH_DEPENDENCIES="v1.4.7"
+VERSION="v1.3.8"
+VERSION_WITH_DEPENDENCIES="v1.4.8"
 
 git add -A
 git commit -m "{$1}"
