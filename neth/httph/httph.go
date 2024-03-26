@@ -17,7 +17,8 @@ import (
 	"github.com/paulfdunn/go-helper/osh/runtimeh"
 )
 
-// BodyUnmarshal - Unmarshalls a request body (JSON) into an object.
+// BodyUnmarshal - Unmarshals a request body (JSON) into an object. On any error the header
+// is written with the appropriate http.Status; callers should not write header status.
 func BodyUnmarshal(w http.ResponseWriter, r *http.Request, obj interface{}) error {
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
