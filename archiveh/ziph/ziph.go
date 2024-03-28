@@ -3,7 +3,6 @@ package ziph
 
 import (
 	"archive/zip"
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -20,24 +19,22 @@ type ZipStats struct {
 
 // AsyncUnzip asynchronously unzips inputPath to outputPath; outputPath will be
 // created if it does not exist. Directories are created with permDir permissions.
-// Progress can be monitored via the returned channels, which return done, processed
-// paths, and any errors. The done channel will fire once when work is done.
-func AsyncUnzip(inputPath, outputPath string, permDir os.FileMode) (context.Context, context.CancelFunc, <-chan string, <-chan error) {
-	zs, err := GetZipStats(inputPath)
-	if err != nil {
-		// If GetZipStats failed, just set buffer lengths to 1 because the zip.OpenReader
-		// will fail again below and return.
-		zs.FileCount = 1
-	}
-	ctx, cancel := context.WithCancel(context.Background())
+// Set the bufSize to the number of files (from GetZipStats) to prevent this function
+// from being blocked output channels not being read fast enough.
+// Progress can be monitored via the returned channels, which return cancel, processed
+// paths, and any errors. The cancel channel can be used to cancel an operation.
+// The operation is complete when both processed paths and errors channels are closed.
+func AsyncUnzip(inputPath, outputPath string, bufSize int, permDir os.FileMode) (chan<- bool, <-chan string, <-chan error) {
+	cancel := make(chan bool, 1)
 	// Size channels so that they don't block if the caller is only checking done.
-	processedPaths := make(chan string, zs.FileCount)
-	errors := make(chan error, zs.FileCount)
+	processedPaths := make(chan string, bufSize)
+	errors := make(chan error, bufSize)
 	go func() {
 		zr, err := zip.OpenReader(inputPath)
 		if err != nil {
 			errors <- err
-			cancel()
+			close(processedPaths)
+			close(errors)
 			return
 		}
 		defer zr.Close()
@@ -45,13 +42,17 @@ func AsyncUnzip(inputPath, outputPath string, permDir os.FileMode) (context.Cont
 		outputPath, err = filepath.Abs(outputPath)
 		if err != nil {
 			errors <- err
-			cancel()
+			close(processedPaths)
+			close(errors)
 			return
 		}
 
 		for _, f := range zr.File {
 			select {
-			case <-ctx.Done():
+			case <-cancel:
+				errors <- fmt.Errorf("AsynUnzip canceled")
+				close(processedPaths)
+				close(errors)
 				return
 			default:
 			}
@@ -59,23 +60,24 @@ func AsyncUnzip(inputPath, outputPath string, permDir os.FileMode) (context.Cont
 			processedPaths <- outputPath
 			if err != nil {
 				errors <- err
-				cancel()
-				return
 			}
 		}
-		cancel()
+
+		close(processedPaths)
+		close(errors)
 	}()
 
-	return ctx, cancel, processedPaths, errors
+	return cancel, processedPaths, errors
 }
 
 // AsyncZip asynchronously creates a compressed ZIP file, of file/directories
 // in paths, at zipPath. The paths are turned into absolute paths, then made
 // relative by removing the leading filepath.Separator.
-// Progress can be monitored via the returned channels, which return done, processed
-// paths, and any errors. The done channel will fire once when work is done.
-func AsyncZip(zipPath string, paths []string) (context.Context, context.CancelFunc, <-chan string, <-chan error) {
-	ctx, cancel := context.WithCancel(context.Background())
+// Progress can be monitored via the returned channels, which return cancel, processed
+// paths, and any errors. The cancel channel can be used to cancel an operation.
+// The operation is complete when both processed paths and errors channels are closed.
+func AsyncZip(zipPath string, paths []string) (chan<- bool, <-chan string, <-chan error) {
+	cancel := make(chan bool, 1)
 	// Size channels so that they don't block if the caller is only checking done.
 	processedPaths := make(chan string, len(paths))
 	errors := make(chan error, len(paths))
@@ -83,7 +85,8 @@ func AsyncZip(zipPath string, paths []string) (context.Context, context.CancelFu
 		f, err := os.Create(zipPath)
 		if err != nil {
 			errors <- err
-			cancel()
+			close(processedPaths)
+			close(errors)
 			return
 		}
 		defer f.Close()
@@ -93,7 +96,10 @@ func AsyncZip(zipPath string, paths []string) (context.Context, context.CancelFu
 
 		for _, path := range paths {
 			select {
-			case <-ctx.Done():
+			case <-cancel:
+				errors <- fmt.Errorf("AsyncZip canceled")
+				close(processedPaths)
+				close(errors)
 				return
 			default:
 			}
@@ -104,12 +110,12 @@ func AsyncZip(zipPath string, paths []string) (context.Context, context.CancelFu
 			}
 		}
 
-		// The file must be closed before signaling OK to proceed.
 		zipWriter.Close()
-		cancel()
+		close(processedPaths)
+		close(errors)
 	}()
 
-	return ctx, cancel, processedPaths, errors
+	return cancel, processedPaths, errors
 }
 
 // GetZipStats is for getting statistics on a zip file; currently only

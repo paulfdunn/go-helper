@@ -7,6 +7,7 @@ import (
 	"io"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/paulfdunn/go-helper/cryptoh"
 	"github.com/paulfdunn/go-helper/testingh"
@@ -24,31 +25,42 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	zipDir := t.TempDir()
 	fmt.Printf("zipDir: %s\n", zipDir)
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
-	ctx, _, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths)
+	_, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths)
 	var pathCount, errCount int
-	<-ctx.Done()
 	noMessage := false
 	for {
 		select {
-		case pp := <-processedPaths:
-			pathCount++
-			fmt.Printf("AsyncZip processed path: %s\n", pp)
-		case err := <-errs:
-			errCount++
-			fmt.Printf("error: %v\n", err)
+		case pp, ok := <-processedPaths:
+			if ok {
+				pathCount++
+				fmt.Printf("AsyncZip processed path: %s\n", pp)
+			} else {
+				processedPaths = nil
+			}
+		case err, ok := <-errs:
+			if ok {
+				errCount++
+				fmt.Printf("error: %v\n", err)
+			} else {
+				errs = nil
+			}
 		default:
 			noMessage = true
 		}
 
 		if noMessage {
-			break
+			if processedPaths == nil && errs == nil {
+				fmt.Println("AsyncZip is done.")
+				break
+			}
+			time.Sleep(time.Second)
 		}
 	}
 
 	// Test gitZipStats
-	n, err := GetZipStats(zipFilePath)
-	if err != nil || n.FileCount != len(testFilePaths) {
-		t.Errorf("GetZipStats issue, n: %d, err: +%v", n, err)
+	zs, err := GetZipStats(zipFilePath)
+	if err != nil || zs.FileCount != len(testFilePaths) {
+		t.Errorf("GetZipStats issue, n: %d, err: +%v", zs, err)
 	}
 
 	// Test AsyncZip outputs.
@@ -58,25 +70,36 @@ func TestZipUnzipShaCompare(t *testing.T) {
 
 	// AsyncUnzip the files into a new TempDir
 	unzipDir := t.TempDir()
-	ctx, _, processedPaths, errs = AsyncUnzip(zipFilePath, unzipDir, 0755)
+	_, processedPaths, errs = AsyncUnzip(zipFilePath, unzipDir, zs.FileCount, 0755)
 	pathCount = 0
 	errCount = 0
-	<-ctx.Done()
 	noMessage = false
 	for {
 		select {
-		case pp := <-processedPaths:
-			pathCount++
-			fmt.Printf("AsyncUnzip processed path: %s\n", pp)
-		case err := <-errs:
-			errCount++
-			fmt.Printf("error: %v\n", err)
+		case pp, ok := <-processedPaths:
+			if ok {
+				pathCount++
+				fmt.Printf("AsyncUnzip processed path: %s\n", pp)
+			} else {
+				processedPaths = nil
+			}
+		case err, ok := <-errs:
+			if ok {
+				errCount++
+				fmt.Printf("error: %v\n", err)
+			} else {
+				errs = nil
+			}
 		default:
 			noMessage = true
 		}
 
 		if noMessage {
-			break
+			if processedPaths == nil && errs == nil {
+				fmt.Println("AsyncZip is done.")
+				break
+			}
+			time.Sleep(time.Millisecond)
 		}
 	}
 
