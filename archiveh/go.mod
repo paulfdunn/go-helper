@@ -3,6 +3,6 @@ module github.com/paulfdunn/go-helper/archiveh
 go 1.21.8
 
 require (
-	github.com/paulfdunn/go-helper/cryptoh v1.3.10
-	github.com/paulfdunn/go-helper/testingh v1.3.10
+	github.com/paulfdunn/go-helper/cryptoh v1.3.11
+	github.com/paulfdunn/go-helper/testingh v1.3.11
 )
