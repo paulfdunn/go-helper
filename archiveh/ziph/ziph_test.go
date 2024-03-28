@@ -7,7 +7,6 @@ import (
 	"io"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/paulfdunn/go-helper/cryptoh"
 	"github.com/paulfdunn/go-helper/testingh"
@@ -39,11 +38,11 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	done, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths)
 	var dn bool
 	var pathCount, errCount int
+	dn = <-done
+	fmt.Printf("done: %t\n", dn)
+	noMessage := false
 	for {
-		noMessage := false
 		select {
-		case dn = <-done:
-			fmt.Printf("done: %t\n", dn)
 		case pp := <-processedPaths:
 			pathCount++
 			fmt.Printf("processed path: %s\n", pp)
@@ -55,10 +54,7 @@ func TestZipUnzipShaCompare(t *testing.T) {
 		}
 
 		if noMessage {
-			if dn {
-				break
-			}
-			time.Sleep(time.Second)
+			break
 		}
 	}
 
@@ -76,14 +72,13 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	// AsyncUnzip the files into a new TempDir
 	unzipDir := t.TempDir()
 	done, processedPaths, errs = AsyncUnzip(zipFilePath, unzipDir, 0755)
-	dn = false
 	pathCount = 0
 	errCount = 0
+	dn = <-done
+	fmt.Printf("done: %t\n", dn)
+	noMessage = false
 	for {
-		noMessage := false
 		select {
-		case dn = <-done:
-			fmt.Printf("done: %t\n", dn)
 		case pp := <-processedPaths:
 			pathCount++
 			fmt.Printf("processed path: %s\n", pp)
@@ -95,10 +90,7 @@ func TestZipUnzipShaCompare(t *testing.T) {
 		}
 
 		if noMessage {
-			if dn {
-				break
-			}
-			time.Sleep(time.Second)
+			break
 		}
 	}
 
