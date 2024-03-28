@@ -13,6 +13,39 @@ import (
 	"github.com/paulfdunn/go-helper/testingh"
 )
 
+func TestCanels(t *testing.T) {
+	testFilePaths, err := createTestFiles(t)
+	if err != nil {
+		t.Fatalf("test files not created.")
+	}
+
+	// if the cancel were not recognized, this would fail with a timeout.
+	zipDir := t.TempDir()
+	fmt.Printf("zipDir: %s\n", zipDir)
+	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
+	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths)
+	cancel <- true
+	select {
+	case err = <-errs:
+	}
+	fmt.Printf("AsyncZip cancel returned: %+v\n", err)
+
+	// Create a zip file so unzip doesn't just exit with  no files.
+	_, _, errs = AsyncZip(zipFilePath, testFilePaths)
+	select {
+	case <-errs:
+		// wait for channel to close and zip to be done
+	}
+	unzipDir := t.TempDir()
+	cancel, _, errs = AsyncUnzip(zipFilePath, unzipDir, 1, 0755)
+	cancel <- true
+	time.Sleep(time.Second)
+	select {
+	case err = <-errs:
+	}
+	fmt.Printf("AsyncUnzip cancel returned: %+v\n", err)
+}
+
 // TestZipUnzipShaCompare tests a round trip operation of creating a files, zipping,
 // checking GetZipStats, unzipping, and comparing the checksum of the input and unzipped files.
 func TestZipUnzipShaCompare(t *testing.T) {
