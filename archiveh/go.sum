@@ -30,6 +30,8 @@ github.com/paulfdunn/go-helper/cryptoh v1.3.11 h1:6sL8X4DJoNCYV5n5MY1iM+r83HnL6h
 github.com/paulfdunn/go-helper/cryptoh v1.3.11/go.mod h1:+hoLkM5s4+9s+cZA/HRR9IeXdue5UwxVb07BytjfF5M=
 github.com/paulfdunn/go-helper/cryptoh v1.3.12 h1:JuYEInE3iYZmu0DxRKxrHnM+wwyl7SPovm16oPqoots=
 github.com/paulfdunn/go-helper/cryptoh v1.3.12/go.mod h1:+hoLkM5s4+9s+cZA/HRR9IeXdue5UwxVb07BytjfF5M=
+github.com/paulfdunn/go-helper/cryptoh v1.3.13 h1:e/gTwbuGzVkiNZtNugefAmtPeJwXAzJrC3w+FK8JVm0=
+github.com/paulfdunn/go-helper/cryptoh v1.3.13/go.mod h1:+hoLkM5s4+9s+cZA/HRR9IeXdue5UwxVb07BytjfF5M=
 github.com/paulfdunn/go-helper/testingh v1.0.0 h1:UnU00q+uf4SQC7+ce5EBfJWa5PuI9FSGScV848xC2kA=
 github.com/paulfdunn/go-helper/testingh v1.0.0/go.mod h1:lOkqGCzUUnMEjWwOs5S0fnCtjnxvXjbP4WvXw14eG7g=
 github.com/paulfdunn/go-helper/testingh v1.0.22 h1:kK8Vo86f/C3lyMeWtNHyFMpKyhHv8LKSjVV43RtEQkM=
@@ -62,3 +64,5 @@ github.com/paulfdunn/go-helper/testingh v1.3.11 h1:TY0j+Yjp6EAt2HYy80UITVPWp9LTN
 github.com/paulfdunn/go-helper/testingh v1.3.11/go.mod h1:Z0L0k383BuNywEfKAeTbw7kmCOz5fgiQQLjhtxhFez4=
 github.com/paulfdunn/go-helper/testingh v1.3.12 h1:x1hJN7lfVTQMy/t0/y++5AWjHOfj36zP0dmiZxk69M8=
 github.com/paulfdunn/go-helper/testingh v1.3.12/go.mod h1:Z0L0k383BuNywEfKAeTbw7kmCOz5fgiQQLjhtxhFez4=
+github.com/paulfdunn/go-helper/testingh v1.3.13 h1:vs9mhZeF1kCNaOEZ1eS7/4sU9LcK7P2dJQS2woKmk0E=
+github.com/paulfdunn/go-helper/testingh v1.3.13/go.mod h1:Z0L0k383BuNywEfKAeTbw7kmCOz5fgiQQLjhtxhFez4=
