@@ -3,8 +3,8 @@
 # with the tags. Accepts a quotes string for the commit message
 # Note that the versioning scheme is that with no interdependencies get the odd minor version, then
 # packages with interdependencies get the next higher even version.
-VERSION="v1.3.14"
-VERSION_WITH_DEPENDENCIES="v1.4.14"
+VERSION="v1.3.15"
+VERSION_WITH_DEPENDENCIES="v1.4.15"
 
 git add -A
 git commit -m "{$1}"
@@ -44,13 +44,14 @@ git tag databaseh/"${VERSION_WITH_DEPENDENCIES}"
 git tag neth/"${VERSION_WITH_DEPENDENCIES}"
 git push origin --tags
 
-echo "go get -u github.com/paulfdunn/go-helper/archiveh@${VERSION_WITH_DEPENDENCIES}"
-echo "go get -u github.com/paulfdunn/go-helper/cryptoh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/databaseh@${VERSION_WITH_DEPENDENCIES}"
-echo "go get -u github.com/paulfdunn/go-helper/encodingh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/logh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/mathh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/neth@${VERSION_WITH_DEPENDENCIES}"
-echo "go get -u github.com/paulfdunn/go-helper/osh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/slicesh@${VERSION}"
-echo "go get -u github.com/paulfdunn/go-helper/testingh@${VERSION}"
+echo "\n\nUse the below to update packages"
+echo "go get -u github.com/paulfdunn/go-helper/archiveh@${VERSION_WITH_DEPENDENCIES}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/cryptoh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/databaseh@${VERSION_WITH_DEPENDENCIES}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/encodingh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/logh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/mathh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/neth@${VERSION_WITH_DEPENDENCIES}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/osh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/slicesh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/testingh@${VERSION}; go mod tidy"

@@ -60,8 +60,8 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
 	_, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths)
 	var pathCount, errCount int
-	noMessage := false
 	for {
+		noMessage := false
 		select {
 		case pp, ok := <-processedPaths:
 			if ok {
@@ -106,8 +106,8 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	_, processedPaths, errs = AsyncUnzip(zipFilePath, unzipDir, zs.FileCount, 0755)
 	pathCount = 0
 	errCount = 0
-	noMessage = false
 	for {
+		noMessage := false
 		select {
 		case pp, ok := <-processedPaths:
 			if ok {
