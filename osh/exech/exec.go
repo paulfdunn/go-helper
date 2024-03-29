@@ -29,7 +29,7 @@ type ExecArgs struct {
 }
 
 // ExecCommandContext wraps os.exec.CommandContext to provide a function that accepts a context, and
-// returns: stdout, stderr, rc, err.
+// returns: rc, err.
 // This is a blocking call that only returns when the command completes.
 // Callers that don't want to provide a context can pass in `context.TODO()`
 func ExecCommandContext(execArgs *ExecArgs) (int, error) {
@@ -49,10 +49,13 @@ func ExecCommandContext(execArgs *ExecArgs) (int, error) {
 }
 
 // ExecShellContext wraps os.exec.CommandContext to provide a function that accepts a context, runs in a shell,
-// and that returns: stdout, stderr, rc, err.
+// and that returns: rc, err.
 // Callers that don't want to provide a context can pass in `context.TODO()`
 func ExecShellContext(execArgs *ExecArgs) (int, error) {
-	cmdString := execArgs.Command + " " + strings.Join(execArgs.Args, " ")
+	cmdString := execArgs.Command
+	if execArgs.Args != nil && len(execArgs.Args) > 0 {
+		strings.Join([]string{cmdString, strings.Join(execArgs.Args, " ")}, " ")
+	}
 	if len(Shell) > 1 {
 		execArgs.Args = append(Shell[len(Shell)-1:], cmdString)
 	} else {
