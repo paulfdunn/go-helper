@@ -44,3 +44,13 @@ git tag databaseh/"${VERSION_WITH_DEPENDENCIES}"
 git tag neth/"${VERSION_WITH_DEPENDENCIES}"
 git push origin --tags
 
+echo "go get -u github.com/paulfdunn/go-helper/archiveh@${VERSION_WITH_DEPENDENCIES}"
+echo "go get -u github.com/paulfdunn/go-helper/cryptoh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/databaseh@${VERSION_WITH_DEPENDENCIES}"
+echo "go get -u github.com/paulfdunn/go-helper/encodingh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/logh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/mathh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/neth@${VERSION_WITH_DEPENDENCIES}"
+echo "go get -u github.com/paulfdunn/go-helper/osh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/slicesh@${VERSION}"
+echo "go get -u github.com/paulfdunn/go-helper/testingh@${VERSION}"
