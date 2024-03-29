@@ -57,7 +57,7 @@ func AsyncUnzip(inputPath, outputPath string, bufSize int, permDir os.FileMode) 
 			default:
 			}
 			err := removeFromZip(f, outputPath, permDir)
-			processedPaths <- outputPath
+			processedPaths <- filepath.Join(outputPath, f.Name)
 			if err != nil {
 				errors <- err
 			}

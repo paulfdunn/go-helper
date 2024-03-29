@@ -13,7 +13,7 @@ import (
 	"github.com/paulfdunn/go-helper/testingh"
 )
 
-func TestCanels(t *testing.T) {
+func TestCancels(t *testing.T) {
 	testFilePaths, err := createTestFiles(t)
 	if err != nil {
 		t.Fatalf("test files not created.")
