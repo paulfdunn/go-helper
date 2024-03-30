@@ -36,3 +36,5 @@ github.com/paulfdunn/go-helper/osh v1.3.15 h1:JgxGWuNDXYHHzpF+jOzB6RVqammeYiVeGA
 github.com/paulfdunn/go-helper/osh v1.3.15/go.mod h1:vw9S4fgUY7NDcwyxy9O9xHdCVhk+VqgHQFiICEMsoxQ=
 github.com/paulfdunn/go-helper/osh v1.3.16 h1:xc3dYf2uKenmlcJunkTmoh4OLbfGLWYD+RphxrJDl8Q=
 github.com/paulfdunn/go-helper/osh v1.3.16/go.mod h1:vw9S4fgUY7NDcwyxy9O9xHdCVhk+VqgHQFiICEMsoxQ=
+github.com/paulfdunn/go-helper/osh v1.5.0 h1:1tlbnHq0wISk7HSBCvMSnE400SV9lBksazF/2XNWzIs=
+github.com/paulfdunn/go-helper/osh v1.5.0/go.mod h1:vw9S4fgUY7NDcwyxy9O9xHdCVhk+VqgHQFiICEMsoxQ=
