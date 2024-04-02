@@ -23,7 +23,7 @@ func TestCancels(t *testing.T) {
 	zipDir := t.TempDir()
 	fmt.Printf("zipDir: %s\n", zipDir)
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
-	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths)
+	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths, true)
 	cancel <- true
 	select {
 	case err = <-errs:
@@ -31,7 +31,7 @@ func TestCancels(t *testing.T) {
 	fmt.Printf("AsyncZip cancel returned: %+v\n", err)
 
 	// Create a zip file so unzip doesn't just exit with  no files.
-	_, _, errs = AsyncZip(zipFilePath, testFilePaths)
+	_, _, errs = AsyncZip(zipFilePath, testFilePaths, true)
 	select {
 	case <-errs:
 		// wait for channel to close and zip to be done
@@ -46,9 +46,15 @@ func TestCancels(t *testing.T) {
 	fmt.Printf("AsyncUnzip cancel returned: %+v\n", err)
 }
 
-// TestZipUnzipShaCompare tests a round trip operation of creating a files, zipping,
+// testZipUnzipShaCompare tests a round trip operation of creating a files, zipping,
 // checking GetZipStats, unzipping, and comparing the checksum of the input and unzipped files.
+// Both absolute and relative paths are tested.
 func TestZipUnzipShaCompare(t *testing.T) {
+	testZipUnzipShaCompare(t, true)
+	testZipUnzipShaCompare(t, false)
+}
+
+func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 	testFilePaths, err := createTestFiles(t)
 	if err != nil {
 		t.Fatalf("test files not created.")
@@ -58,7 +64,7 @@ func TestZipUnzipShaCompare(t *testing.T) {
 	zipDir := t.TempDir()
 	fmt.Printf("zipDir: %s\n", zipDir)
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
-	_, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths)
+	_, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths, absolute)
 	var pathCount, errCount int
 	for {
 		noMessage := false
