@@ -70,15 +70,13 @@ func AsyncUnzip(inputPath, outputPath string, bufSize int, permDir os.FileMode) 
 	return cancel, processedPaths, errors
 }
 
-// AsyncZip asynchronously creates a compressed ZIP file, of file/directories
-// in paths, at zipPath.
-// If absolute==tru, the paths are turned into absolute paths, then made
-// relative by removing the leading filepath.Separator. Otherwise Clean is called on
-// the path and again the path is made relative by removing the leading filepath.Separator
-// Progress can be monitored via the returned channels, which return cancel, processed
-// paths, and any errors. The cancel channel can be used to cancel an operation.
+// AsyncZip asynchronously creates a compressed ZIP file, of file/directories in paths, at zipPath.
+// The paths are turned into absolute paths, then made relative by removing the leading
+// filepath.Separator. When zipped, if trimFilepath !=nil, *trimFilepath is left trimmed from paths
+// to create relative paths. Progress can be monitored via the returned channels, which return
+// cancel, processed paths, and any errors. The cancel channel can be used to cancel an operation.
 // The operation is complete when both processed paths and errors channels are closed.
-func AsyncZip(zipPath string, paths []string, absolute bool) (chan<- bool, <-chan string, <-chan error) {
+func AsyncZip(zipPath string, paths []string, trimFilepath *string) (chan<- bool, <-chan string, <-chan error) {
 	cancel := make(chan bool, 1)
 	// Size channels so that they don't block if the caller is only checking done.
 	processedPaths := make(chan string, len(paths))
@@ -105,7 +103,7 @@ func AsyncZip(zipPath string, paths []string, absolute bool) (chan<- bool, <-cha
 				return
 			default:
 			}
-			err := filepath.WalkDir(path, addToZip(zipWriter, absolute))
+			err := filepath.WalkDir(path, addToZip(zipWriter, trimFilepath))
 			processedPaths <- path
 			if err != nil {
 				errors <- err
@@ -140,7 +138,7 @@ func GetZipStats(inputPath string) (*ZipStats, error) {
 // do not directly call this function.
 // The paths are turned into absolute paths, then made relative by removing
 // the leading filepath.Separator.
-func addToZip(zipWriter *zip.Writer, absolute bool) func(string, fs.DirEntry, error) error {
+func addToZip(zipWriter *zip.Writer, trimFilepath *string) func(string, fs.DirEntry, error) error {
 	return func(path string, dirEntry fs.DirEntry, err error) error {
 		if err != nil {
 			return fs.SkipDir
@@ -155,13 +153,14 @@ func addToZip(zipWriter *zip.Writer, absolute bool) func(string, fs.DirEntry, er
 		if err != nil {
 			return err
 		}
-		if absolute {
-			header.Name, err = filepath.Abs(path)
-			if err != nil {
-				return err
-			}
+		zipFilepath, err := filepath.Abs(path)
+		if err != nil {
+			return err
+		}
+		if trimFilepath != nil {
+			header.Name = strings.TrimPrefix(zipFilepath, *trimFilepath)
 		} else {
-			header.Name = filepath.Clean(path)
+			header.Name = zipFilepath
 		}
 		header.Name = strings.TrimPrefix(header.Name, string(filepath.Separator))
 		if info.IsDir() {

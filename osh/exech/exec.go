@@ -54,7 +54,7 @@ func ExecCommandContext(execArgs *ExecArgs) (int, error) {
 func ExecShellContext(execArgs *ExecArgs) (int, error) {
 	cmdString := execArgs.Command
 	if execArgs.Args != nil && len(execArgs.Args) > 0 {
-		strings.Join([]string{cmdString, strings.Join(execArgs.Args, " ")}, " ")
+		cmdString = strings.Join([]string{cmdString, strings.Join(execArgs.Args, " ")}, " ")
 	}
 	if len(Shell) > 1 {
 		execArgs.Args = append(Shell[len(Shell)-1:], cmdString)

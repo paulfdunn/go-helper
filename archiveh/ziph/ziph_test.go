@@ -23,7 +23,7 @@ func TestCancels(t *testing.T) {
 	zipDir := t.TempDir()
 	fmt.Printf("zipDir: %s\n", zipDir)
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
-	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths, true)
+	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths, nil)
 	cancel <- true
 	select {
 	case err = <-errs:
@@ -31,7 +31,7 @@ func TestCancels(t *testing.T) {
 	fmt.Printf("AsyncZip cancel returned: %+v\n", err)
 
 	// Create a zip file so unzip doesn't just exit with  no files.
-	_, _, errs = AsyncZip(zipFilePath, testFilePaths, true)
+	_, _, errs = AsyncZip(zipFilePath, testFilePaths, nil)
 	select {
 	case <-errs:
 		// wait for channel to close and zip to be done
@@ -64,7 +64,14 @@ func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 	zipDir := t.TempDir()
 	fmt.Printf("zipDir: %s\n", zipDir)
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
-	_, processedPaths, errs := AsyncZip(zipFilePath, testFilePaths, absolute)
+	var errs <-chan error
+	var processedPaths <-chan string
+	if absolute {
+		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, nil)
+	} else {
+		trim := filepath.Dir(testFilePaths[0])
+		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, &trim)
+	}
 	var pathCount, errCount int
 	for {
 		noMessage := false
@@ -153,7 +160,12 @@ func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 		if err != nil {
 			t.Errorf("getting hash, error: %+v", err)
 		}
-		outputFileHash, err := cryptoh.Sha256FileHash(filepath.Join(unzipDir, tp))
+		var outputFileHash []byte
+		if absolute {
+			outputFileHash, err = cryptoh.Sha256FileHash(filepath.Join(unzipDir, tp))
+		} else {
+			outputFileHash, err = cryptoh.Sha256FileHash(filepath.Join(unzipDir, filepath.Base(tp)))
+		}
 		if err != nil {
 			t.Errorf("getting hash, error: %+v", err)
 		}

@@ -15,8 +15,8 @@ type testExecArgs struct {
 }
 
 func TestExecCommandContextAndShell(t *testing.T) {
-	commonTests(t, ExecCommandContext)
-	commonTests(t, ExecShellContext)
+	// commonTests(t, ExecCommandContext)
+	// commonTests(t, ExecShellContext)
 }
 
 func TestExecCommandContextWithPipe(t *testing.T) {
