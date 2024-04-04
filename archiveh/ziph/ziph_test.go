@@ -70,7 +70,7 @@ func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, nil)
 	} else {
 		trim := filepath.Dir(testFilePaths[0])
-		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, &trim)
+		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, []string{trim})
 	}
 	var pathCount, errCount int
 	for {
