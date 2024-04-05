@@ -25,24 +25,18 @@ func TestCancels(t *testing.T) {
 	zipFilePath := filepath.Join(zipDir, "test_asynczip.zip")
 	cancel, _, errs := AsyncZip(zipFilePath, testFilePaths, nil)
 	cancel <- true
-	select {
-	case err = <-errs:
-	}
+	err = <-errs
 	fmt.Printf("AsyncZip cancel returned: %+v\n", err)
 
 	// Create a zip file so unzip doesn't just exit with  no files.
 	_, _, errs = AsyncZip(zipFilePath, testFilePaths, nil)
-	select {
-	case <-errs:
-		// wait for channel to close and zip to be done
-	}
+	// Wait for channel to close and zip to be done
+	<-errs
 	unzipDir := t.TempDir()
 	cancel, _, errs = AsyncUnzip(zipFilePath, unzipDir, 1, 0755)
 	cancel <- true
 	time.Sleep(time.Second)
-	select {
-	case err = <-errs:
-	}
+	err = <-errs
 	fmt.Printf("AsyncUnzip cancel returned: %+v\n", err)
 }
 
@@ -183,8 +177,7 @@ func createTestFiles(t *testing.T) ([]string, error) {
 	if err != nil {
 		t.Errorf("Error creating binary file: %+v", err)
 	}
-	var sr io.Reader
-	sr = &testingh.StringReader{Data: []byte("1234567890")}
+	sr := io.Reader(&testingh.StringReader{Data: []byte("1234567890")})
 	tfStr := testingh.TestFile{BufferSize: int64(1e1), FileName: "test_string", FileSize: int64(1e6), Reader: &sr}
 	err = testingh.CreateTestFile(t, testFileDir, &tfStr)
 	if err != nil {

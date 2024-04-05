@@ -1,6 +1,7 @@
 package kvs
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,7 +19,10 @@ type TestSerialize struct {
 }
 
 func TestSerializeDeserialize(t *testing.T) {
-	testSetupSerialize()
+	if err := testSetupSerialize(); err != nil {
+		// The datasource may not be present.
+		fmt.Printf("testSetupSerialize warning: %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)
@@ -50,7 +54,10 @@ func TestSerializeDeserialize(t *testing.T) {
 
 func TestNegativeDeserialize(t *testing.T) {
 	// Deserialize something that was never Serialized.
-	testSetupSerialize()
+	if err := testSetupSerialize(); err != nil {
+		// The datasource may not be present.
+		fmt.Printf("testSetupSerialize warning: %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)

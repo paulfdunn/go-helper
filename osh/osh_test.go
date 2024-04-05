@@ -33,7 +33,9 @@ func TestRemoveAllFiles(t *testing.T) {
 		}
 	}
 
-	RemoveAllFiles(filepath.Join(tempDir, "killme01*"))
+	if err := RemoveAllFiles(filepath.Join(tempDir, "killme01*")); err != nil {
+		t.Errorf("RemoveAllFiles error: %+v", err)
+	}
 	files, err := filepath.Glob(filepath.Join(tempDir, "killme*"))
 	if err != nil {
 		t.Errorf("getting file list, error: %v", err)
@@ -44,7 +46,9 @@ func TestRemoveAllFiles(t *testing.T) {
 		return
 	}
 
-	RemoveAllFiles(filepath.Join(tempDir, "killme0*"))
+	if err := RemoveAllFiles(filepath.Join(tempDir, "killme0*")); err != nil {
+		t.Errorf("RemoveAllFiles error: %+v", err)
+	}
 	files, err = filepath.Glob(filepath.Join(tempDir, "killme*"))
 	if err != nil {
 		t.Errorf("getting file list, error: %v", err)

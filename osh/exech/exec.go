@@ -3,7 +3,6 @@ package exech
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os/exec"
 	"strings"
@@ -38,7 +37,7 @@ func ExecCommandContext(execArgs *ExecArgs) (int, error) {
 	cmd.Stdout = execArgs.Stdout
 	err := cmd.Run()
 	if err != nil {
-		rerr := runtimeh.SourceInfoError(fmt.Sprintf("ExecCommandContext Run error"), err)
+		rerr := runtimeh.SourceInfoError("ExecCommandContext Run error", err)
 		rc := ErrorWithNoReturnCode
 		if exitError, ok := err.(*exec.ExitError); ok {
 			rc = exitError.Sys().(syscall.WaitStatus).ExitStatus()

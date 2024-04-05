@@ -81,7 +81,9 @@ func New(name string, filePath string, levels []string, level LoghLevel, flags i
 
 	// Shutdown and delete any existing loggers at this name.
 	if _, ok := Map[name]; ok {
-		Map[name].Shutdown()
+		if err := Map[name].Shutdown(); err != nil {
+			fmt.Printf("Could not shutdown running logger, error: %+v", err)
+		}
 	}
 	delete(Map, name)
 
@@ -260,7 +262,9 @@ func (l *Logger) printCommon(level LoghLevel, format string, v ...interface{}) {
 	}
 
 	if level >= l.Level {
-		l.loggers[level].Output(3, fmt.Sprintf(format, v...))
+		if err := l.loggers[level].Output(3, fmt.Sprintf(format, v...)); err != nil {
+			fmt.Printf("Output error: %+v", err)
+		}
 	}
 
 	if l.filePath == "" {
@@ -268,6 +272,8 @@ func (l *Logger) printCommon(level LoghLevel, format string, v ...interface{}) {
 	}
 	l.writesSinceCheckRotate++
 	if l.writesSinceCheckRotate >= l.checkLogSize {
-		l.checkSizeAndRotate()
+		if err := l.checkSizeAndRotate(); err != nil {
+			fmt.Printf("checkSizeAndRotate error: %+v", err)
+		}
 	}
 }

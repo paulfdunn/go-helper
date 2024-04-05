@@ -3,6 +3,7 @@ package httph
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,7 +27,9 @@ func TestBodyUnmarshal(t *testing.T) {
 	tsIn := testStruct{ID: id}
 	tsOut := testStruct{}
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		BodyUnmarshal(w, r, &tsOut)
+		if err := BodyUnmarshal(w, r, &tsOut); err != nil {
+			fmt.Printf("BodyUnmarshal error: %+v", err)
+		}
 	}))
 	defer testServer.Close()
 
@@ -65,7 +68,9 @@ func TestCollectURL(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet || r.Method == http.MethodHead {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(returnString))
+			if _, err := w.Write([]byte(returnString)); err != nil {
+				t.Errorf("w.Write error:%+v", err)
+			}
 		}
 	}))
 	defer server.Close()
@@ -95,7 +100,9 @@ func TestCollectURLs(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet || r.Method == http.MethodHead {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(returnString))
+			if _, err := w.Write([]byte(returnString)); err != nil {
+				t.Errorf("w.Write error:%+v", err)
+			}
 		}
 	}))
 	defer server.Close()

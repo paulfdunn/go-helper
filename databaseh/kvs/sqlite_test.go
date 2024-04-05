@@ -28,7 +28,9 @@ func init() {
 }
 
 func TestDeleteGetSet(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error: %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)

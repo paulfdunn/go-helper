@@ -2,7 +2,6 @@ package logh
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -64,7 +63,9 @@ func TestDefaultOutput(t *testing.T) {
 		t.Errorf("Incorrect output for defaultOutput, received:%s", out)
 	}
 
-	Map[loggerName].Shutdown()
+	if err := Map[loggerName].Shutdown(); err != nil {
+		fmt.Printf("Could not shutdown running logger, error: %+v", err)
+	}
 }
 
 // TestLineNumbers is used to verify the Output calldepth parameter is the correct
@@ -80,11 +81,13 @@ func TestLineNumbers(t *testing.T) {
 	Map[loggerName].Printf(0, "this is the Printf call")
 	Map[loggerName].Println(0, "this is the Println call")
 	// Shutdown to flush output.
-	Map[loggerName].Shutdown()
+	if err := Map[loggerName].Shutdown(); err != nil {
+		fmt.Printf("Could not shutdown running logger, error: %+v", err)
+	}
 	logString, _ := readTestLog(testLog, 0)
 	fmt.Println(logString)
-	if !strings.Contains(logString, "logh_test.go:80: this is the Printf call") ||
-		!strings.Contains(logString, "logh_test.go:81: this is the Println call") {
+	if !strings.Contains(logString, "logh_test.go:81: this is the Printf call") ||
+		!strings.Contains(logString, "logh_test.go:82: this is the Println call") {
 		t.Errorf("Output calldepth problem")
 	}
 }
@@ -169,7 +172,9 @@ func TestRotate(t *testing.T) {
 	}
 	shouldContainCheck(t, log0String, log1String, log0ShouldContain, log1ShouldContain)
 
-	Map[loggerName].Shutdown()
+	if err := Map[loggerName].Shutdown(); err != nil {
+		fmt.Printf("Could not shutdown running logger, error: %+v", err)
+	}
 }
 
 // TestShowOutput can be used with the -v parameter to just demo the output. This is not an
@@ -322,7 +327,9 @@ func TestLevels(t *testing.T) {
 		testSetup(t)
 	}
 
-	Map[loggerName].Shutdown()
+	if err := Map[loggerName].Shutdown(); err != nil {
+		fmt.Printf("Could not shutdown running logger, error: %+v", err)
+	}
 }
 
 // Test2Logs tests writing to 2 independent logs
@@ -370,7 +377,7 @@ func Test2Logs(t *testing.T) {
 }
 
 func readTestLog(filepath string, rotation int) (string, error) {
-	b, err := ioutil.ReadFile(filepath + "." + strconv.Itoa(rotation))
+	b, err := os.ReadFile(filepath + "." + strconv.Itoa(rotation))
 	if err != nil {
 		return "", err
 	}

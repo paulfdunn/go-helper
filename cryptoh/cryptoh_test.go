@@ -21,7 +21,9 @@ func init() {
 // shasum -a 256 <testFilePath>
 func ExampleSha256FileHash() {
 	testFilePath := filepath.Join(testDir, "testHash.txt")
-	os.WriteFile(testFilePath, []byte("this is a test"), 0644)
+	if err := os.WriteFile(testFilePath, []byte("this is a test"), 0644); err != nil {
+		fmt.Printf("error writing test file: %+v", err)
+	}
 	hash, err := Sha256FileHash(testFilePath)
 	if err != nil {
 		fmt.Println("Error getting hash....")

@@ -12,8 +12,7 @@ import (
 
 // ExampleStringReader shows how to use StringReader with a io.LimitedReader.
 func ExampleStringReader() {
-	var sr io.Reader
-	sr = &StringReader{[]byte("1234567890")}
+	sr := io.Reader(&StringReader{[]byte("1234567890")})
 	limit := int64(15)
 	buf := new(bytes.Buffer)
 	limitReader := io.LimitReader(sr, limit)
@@ -22,7 +21,9 @@ func ExampleStringReader() {
 		fmt.Printf("io.Copy error: %+v", err)
 	}
 	rdbuf := make([]byte, limit)
-	buf.Read(rdbuf)
+	if _, err := buf.Read(rdbuf); err != nil {
+		fmt.Printf("buf.Read error: %+v", err)
+	}
 	fmt.Printf("%+v", string(rdbuf))
 
 	// Output:
@@ -30,9 +31,8 @@ func ExampleStringReader() {
 }
 
 func TestStringReader(t *testing.T) {
-	var sr io.Reader
 	limit := int64(1e6)
-	sr = &StringReader{[]byte("1234567890")}
+	sr := io.Reader(&StringReader{[]byte("1234567890")})
 	buf := new(bytes.Buffer)
 	limitReader := io.LimitReader(sr, limit)
 	n, err := buf.ReadFrom(limitReader)
@@ -49,8 +49,7 @@ func TestStringReader(t *testing.T) {
 // different io.Readers in a directory per []testFile.
 func TestCreateTestFileInMultipleDirectories(t *testing.T) {
 	// Create slices of slices, where the index +1 == number of files.
-	var sr io.Reader
-	sr = &StringReader{[]byte("1234567890")}
+	sr := io.Reader(&StringReader{[]byte("1234567890")})
 	testFiles := [][]TestFile{
 		{{int64(1e1), "f1", "", int64(9), &rand.Reader}},
 		{{int64(1e1), "f2", "", int64(10), &sr},

@@ -34,7 +34,7 @@ func ByteSliceToString(in []byte, bytesPerLine int) (out string) {
 
 		// Ints format nicely with this; space separated.
 		s := fmt.Sprintf("%02x", inInts[index:end])
-		out += fmt.Sprintf("%s", s[1:len(s)-1])
+		out += s[1 : len(s)-1]
 		out += "\n"
 		index += bytesPerLine
 	}
