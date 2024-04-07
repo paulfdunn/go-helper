@@ -4,7 +4,7 @@
 # For packages with dependencies, the tip of master and the tag will
 # be the same code, but the tip will have the updates for packages with
 # dependencies.
-VERSION="v1.8.1"
+VERSION="v1.8.2"
 
 git add -A
 git commit -m "{$1}"

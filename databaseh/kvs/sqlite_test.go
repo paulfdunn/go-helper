@@ -81,7 +81,9 @@ func TestDeleteGetSet(t *testing.T) {
 }
 
 func TestKeys(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error; %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)
@@ -108,7 +110,9 @@ func TestKeys(t *testing.T) {
 	}
 }
 func TestRowCount(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error; %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)
@@ -135,7 +139,9 @@ func TestRowCount(t *testing.T) {
 
 // Deleting a non-existent key does not produce an error, but the count is zero.
 func TestDeleteNegative(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error; %+v", err)
+	}
 
 	table := "testTable"
 	kvs, err := New(dataSourceName, table)
@@ -152,7 +158,9 @@ func TestDeleteNegative(t *testing.T) {
 }
 
 func TestDeleteStore(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error; %+v", err)
+	}
 
 	table := "testTableN2"
 	kvs, err := New(dataSourceName, table)
@@ -176,7 +184,9 @@ func TestDeleteStore(t *testing.T) {
 }
 
 func TestGetNegative(t *testing.T) {
-	testSetup()
+	if err := testSetup(); err != nil {
+		t.Errorf("testSetup error; %+v", err)
+	}
 
 	table := "testTableN1"
 	kvs, err := New(dataSourceName, table)
