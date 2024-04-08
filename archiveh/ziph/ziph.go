@@ -37,7 +37,11 @@ func AsyncUnzip(inputPath, outputPath string, bufSize int, permDir os.FileMode) 
 			close(errors)
 			return
 		}
-		defer zr.Close()
+		defer func() {
+			if err := zr.Close(); err != nil {
+				fmt.Printf("defer zr.Close() error:%+v\n", err)
+			}
+		}()
 
 		outputPath, err = filepath.Abs(outputPath)
 		if err != nil {
@@ -89,10 +93,18 @@ func AsyncZip(zipPath string, paths []string, trimFilepath []string) (chan<- boo
 			close(errors)
 			return
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				fmt.Printf("f.Close() error:%+v\n", err)
+			}
+		}()
 
 		zipWriter := zip.NewWriter(f)
-		defer zipWriter.Close()
+		defer func() {
+			if err := zipWriter.Close(); err != nil {
+				fmt.Printf("defer zipWriter.Close() warning:%+v\n", err)
+			}
+		}()
 
 		for _, path := range paths {
 			select {
@@ -110,7 +122,9 @@ func AsyncZip(zipPath string, paths []string, trimFilepath []string) (chan<- boo
 			}
 		}
 
-		zipWriter.Close()
+		if err := zipWriter.Close(); err != nil {
+			fmt.Printf("zipWriter.Close error:%+v\n", err)
+		}
 		close(processedPaths)
 		close(errors)
 	}()
@@ -125,7 +139,11 @@ func GetZipStats(inputPath string) (*ZipStats, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer zr.Close()
+	defer func() {
+		if err := zr.Close(); err != nil {
+			fmt.Printf("defer zr.Close() error:%+v\n", err)
+		}
+	}()
 
 	zs := ZipStats{FileCount: 0}
 	for range zr.File {
@@ -183,7 +201,11 @@ func addToZip(zipWriter *zip.Writer, trimFilepath []string) func(string, fs.DirE
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				fmt.Printf("defer f.Close() error:%+v\n", err)
+			}
+		}()
 
 		_, err = io.Copy(headerWriter, f)
 		return err
@@ -217,13 +239,21 @@ func removeFromZip(zipFile *zip.File, outputPath string, permDir os.FileMode) er
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Printf("defer f.Close() error:%+v\n", err)
+		}
+	}()
 
 	irc, err := zipFile.Open()
 	if err != nil {
 		return err
 	}
-	defer irc.Close()
+	defer func() {
+		if err := irc.Close(); err != nil {
+			fmt.Printf("defer irc.Close() error:%+v\n", err)
+		}
+	}()
 
 	if _, err := io.Copy(f, irc); err != nil {
 		return err

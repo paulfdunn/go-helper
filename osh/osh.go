@@ -2,6 +2,7 @@
 package osh
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -14,7 +15,11 @@ func DirIsEmpty(path string) (bool, error) {
 		// Return false if the directory does not exist.
 		return false, err
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Printf("f.Close() error:%+v\n", err)
+		}
+	}()
 
 	// Readdirnames does NOT return "." and ".."; so a single file indicates the dir
 	// is not empty.

@@ -21,7 +21,9 @@ import (
 // is written with the appropriate http.Status; callers should not write header status.
 func BodyUnmarshal(w http.ResponseWriter, r *http.Request, obj interface{}) error {
 	body, err := io.ReadAll(r.Body)
-	r.Body.Close()
+	if err := r.Body.Close(); err != nil {
+		return err
+	}
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return runtimeh.SourceInfoError("reading body", err)
@@ -81,9 +83,15 @@ func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *ht
 	if err != nil {
 		return []byte{}, resp, runtimeh.SourceInfoError("CollectURL client error", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Printf("resp.Body.Close() error:%+v\n", err)
+		}
+	}()
 	body, err := io.ReadAll(resp.Body)
-	resp.Body.Close()
+	if err := resp.Body.Close(); err != nil {
+		return body, resp, err
+	}
 
 	return body, resp, err
 }
@@ -149,7 +157,10 @@ func RequestUsername(r *http.Request) string {
 			} else if strings.Contains(split, "Basic ") {
 				u := strings.Split(split, " ")
 				if len(u) == 2 {
-					user, _ := base64.StdEncoding.DecodeString(u[1])
+					user, err := base64.StdEncoding.DecodeString(u[1])
+					if err != nil {
+						return ""
+					}
 					userSplit := strings.Split(string(user), ":")
 					return string(userSplit[0])
 				}

@@ -3,6 +3,7 @@ package testingh
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -44,7 +45,11 @@ func CreateTestFile(t *testing.T, outputPath string, testFile *TestFile) error {
 		t.Errorf("file creation error: %v", err)
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Printf("f.Close() error:%+v\n", err)
+		}
+	}()
 
 	w := bufio.NewWriter(f)
 	buf := make([]byte, testFile.BufferSize)

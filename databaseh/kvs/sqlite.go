@@ -46,7 +46,11 @@ func (kvs KVS) Delete(key string) (int64, error) {
 	if err != nil {
 		return 0, runtimeh.SourceInfoError("", err)
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			fmt.Printf("stmt.Close() error:%+v\n", err)
+		}
+	}()
 	res, err := stmt.Exec(key)
 	if err != nil {
 		return 0, runtimeh.SourceInfoError("", err)
@@ -82,13 +86,21 @@ func (kvs KVS) Get(key string) ([]byte, error) {
 	if err != nil {
 		return nil, runtimeh.SourceInfoError("", err)
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			fmt.Printf("stmt.Close() error:%+v\n", err)
+		}
+	}()
 
 	rows, err := stmt.Query(key)
 	if err != nil {
 		return nil, runtimeh.SourceInfoError("", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			fmt.Printf("rows.Close() error:%+v\n", err)
+		}
+	}()
 
 	rslt := rows.Next()
 	if !rslt && rows.Err() == nil {
@@ -140,7 +152,11 @@ func (kvs KVS) Set(key string, value []byte) error {
 	if err != nil {
 		return runtimeh.SourceInfoError("", err)
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			fmt.Printf("stmt.Close() error:%+v\n", err)
+		}
+	}()
 	_, err = stmt.Exec(key, value)
 	if err != nil {
 		return runtimeh.SourceInfoError("", err)
