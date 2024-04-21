@@ -38,7 +38,7 @@ func TestFileModifiedFilter(t *testing.T) {
 		t.Errorf("creating file, error: %+v", err)
 	}
 	filteredFiles, err := FileModifiedFilter([]string{oldFile, newFile}, modifiedSeconds)
-	if len(filteredFiles) != 1 || filteredFiles[0] != oldFile {
+	if err != nil || len(filteredFiles) != 1 || filteredFiles[0] != oldFile {
 		t.Error("filtering did not work.")
 	}
 }
