@@ -101,9 +101,9 @@ func AsyncZip(zipPath string, paths []string, trimFilepath []string) (chan<- boo
 
 		zipWriter := zip.NewWriter(f)
 		defer func() {
-			if err := zipWriter.Close(); err != nil {
-				fmt.Printf("defer zipWriter.Close() warning:%+v\n", err)
-			}
+			//nolint:errcheck
+			// The error will always be "zip: writer closed twice", which is not typed and not useful to log.
+			zipWriter.Close()
 		}()
 
 		for _, path := range paths {

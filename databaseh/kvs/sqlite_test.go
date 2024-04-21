@@ -29,7 +29,9 @@ func init() {
 
 func TestDeleteGetSet(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error: %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTable"
@@ -82,7 +84,9 @@ func TestDeleteGetSet(t *testing.T) {
 
 func TestKeys(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error; %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTable"
@@ -111,7 +115,9 @@ func TestKeys(t *testing.T) {
 }
 func TestRowCount(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error; %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTable"
@@ -140,7 +146,9 @@ func TestRowCount(t *testing.T) {
 // Deleting a non-existent key does not produce an error, but the count is zero.
 func TestDeleteNegative(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error; %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTable"
@@ -159,7 +167,9 @@ func TestDeleteNegative(t *testing.T) {
 
 func TestDeleteStore(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error; %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTableN2"
@@ -185,7 +195,9 @@ func TestDeleteStore(t *testing.T) {
 
 func TestGetNegative(t *testing.T) {
 	if err := testSetup(); err != nil {
-		t.Errorf("testSetup error; %+v", err)
+		if _, ok := err.(*os.PathError); !ok {
+			t.Errorf("testSetup error; %+v", err)
+		}
 	}
 
 	table := "testTableN1"
@@ -237,6 +249,8 @@ func rowCount(db *sql.DB, table string) (int, error) {
 	return count, nil
 }
 
+// Depending on test order, there may or may not already be a file present.
+// If there is no file, the error will be of type os.PathError
 func testSetup() error {
 	kvps = kvPairs{
 		{key: "k1", value: []byte("key1")},

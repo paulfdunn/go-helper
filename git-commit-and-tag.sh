@@ -4,7 +4,7 @@
 # For packages with dependencies, the tip of master and the tag will
 # be the same code, but the tip will have the updates for packages with
 # dependencies.
-VERSION="v1.8.3"
+VERSION="v1.9.0"
 
 git add -A
 git commit -m "{$1}"
@@ -44,7 +44,7 @@ git tag databaseh/"${VERSION}"
 git tag neth/"${VERSION}"
 git push origin --tags
 
-echo "\n\nUse the below to update packages"
+echo "\n\nUse the below to update modules"
 echo "go get -u github.com/paulfdunn/go-helper/archiveh@${VERSION}; go mod tidy"
 echo "go get -u github.com/paulfdunn/go-helper/cryptoh@${VERSION}; go mod tidy"
 echo "go get -u github.com/paulfdunn/go-helper/databaseh@${VERSION}; go mod tidy"

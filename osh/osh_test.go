@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func ExampleDirIsEmpty() {
@@ -20,6 +21,26 @@ func ExampleDirIsEmpty() {
 	// Output:
 	// User dir is empty? false
 	// Temp dir is empty? true
+}
+
+func TestFileModifiedFilter(t *testing.T) {
+	modifiedSeconds := 30
+	tmpDir := t.TempDir()
+	oldFile := filepath.Join(tmpDir, "oldfile")
+	_, err := os.Create(oldFile)
+	if err != nil {
+		t.Errorf("creating file, error: %+v", err)
+	}
+	os.Chtimes(oldFile, time.Time{}, time.Now().Add(-time.Duration(modifiedSeconds+1)*time.Second))
+	newFile := filepath.Join(tmpDir, "newfile")
+	_, err = os.Create(newFile)
+	if err != nil {
+		t.Errorf("creating file, error: %+v", err)
+	}
+	filteredFiles, err := FileModifiedFilter([]string{oldFile, newFile}, modifiedSeconds)
+	if len(filteredFiles) != 1 || filteredFiles[0] != oldFile {
+		t.Error("filtering did not work.")
+	}
 }
 
 func TestRemoveAllFiles(t *testing.T) {
