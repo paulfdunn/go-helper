@@ -32,16 +32,16 @@ func DirIsEmpty(path string) (bool, error) {
 	return false, err
 }
 
-// FileModifiedFilter will filter a slice of input files and remove files that
+// FileModifiedAfterFilter will filter a slice of input files and remove files that
 // were not modified within the last modifiedSeconds.
-func FileModifiedFilter(filepaths []string, modifiedSeconds int) ([]string, error) {
+func FileModifiedAfterFilter(filepaths []string, modifiedSeconds int) ([]string, error) {
 	output := make([]string, 0, len(filepaths))
 	for _, fp := range filepaths {
 		fi, err := os.Stat(fp)
 		if err != nil {
 			return nil, err
 		}
-		if fi.ModTime().Before(time.Now().Add(-time.Duration(modifiedSeconds) * time.Second)) {
+		if fi.ModTime().After(time.Now().Add(-time.Duration(modifiedSeconds) * time.Second)) {
 			output = append(output, fp)
 		}
 	}
