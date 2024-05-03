@@ -177,7 +177,10 @@ func addToZip(zipWriter *zip.Writer, trimFilepath []string) func(string, fs.DirE
 		}
 		if trimFilepath != nil {
 			for _, trm := range trimFilepath {
-				header.Name = strings.TrimPrefix(zipFilepath, trm)
+				if strings.HasPrefix(zipFilepath, trm) {
+					header.Name = strings.TrimPrefix(zipFilepath, trm)
+					break
+				}
 			}
 		} else {
 			header.Name = zipFilepath
