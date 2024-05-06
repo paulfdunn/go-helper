@@ -20,8 +20,8 @@ func TestExecCommandContextAndShell(t *testing.T) {
 }
 
 func TestExecCommandContextWithPipe(t *testing.T) {
-	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
-	// (ExecShellContext is required for pipes or other shell supported functions.)
+	// Verify redirect DOES NOT WORK and the string goes to STDOUT.
+	// (ExecShellContext is required for redirects or other shell supported functions.)
 	var stdout, stderr bytes.Buffer
 	tea := testExecArgs{
 		ExecArgs: ExecArgs{
@@ -47,8 +47,7 @@ func TestExecCommandContextWithPipe(t *testing.T) {
 }
 
 func TestExecShellContextWithPipe(t *testing.T) {
-	// Verify pipe DOES NOT WORK and the string goes to STDOUT.
-	// (ExecShellContext is required for pipes or other shell supported functions.)
+	// Verify redirect DOES WORK and the string goes to STDERR.
 	var stdout, stderr bytes.Buffer
 	tea := testExecArgs{
 		ExecArgs: ExecArgs{
