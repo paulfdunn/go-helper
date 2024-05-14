@@ -61,7 +61,7 @@ func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 	var errs <-chan error
 	var processedPaths <-chan string
 	if absolute {
-		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, nil)
+		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, []string{})
 	} else {
 		trim := filepath.Dir(testFilePaths[0])
 		_, processedPaths, errs = AsyncZip(zipFilePath, testFilePaths, []string{trim})
