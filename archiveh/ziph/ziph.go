@@ -115,7 +115,7 @@ func AsyncZip(zipPath string, paths []string, trimFilepath []string) (chan<- boo
 				return
 			default:
 			}
-			err := filepath.WalkDir(path, addToZip(zipWriter, trimFilepath))
+			err = filepath.WalkDir(path, addToZip(zipWriter, trimFilepath, errors))
 			processedPaths <- path
 			if err != nil {
 				errors <- err
@@ -156,9 +156,10 @@ func GetZipStats(inputPath string) (*ZipStats, error) {
 // do not directly call this function.
 // The paths are turned into absolute paths, then made relative by removing
 // the leading filepath.Separator.
-func addToZip(zipWriter *zip.Writer, trimFilepath []string) func(string, fs.DirEntry, error) error {
+func addToZip(zipWriter *zip.Writer, trimFilepath []string, errors chan error) func(string, fs.DirEntry, error) error {
 	return func(path string, dirEntry fs.DirEntry, err error) error {
 		if err != nil {
+			errors <- err
 			return fs.SkipDir
 		}
 

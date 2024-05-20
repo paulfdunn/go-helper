@@ -172,17 +172,20 @@ func testZipUnzipShaCompare(t *testing.T, absolute bool) {
 func createTestFiles(t *testing.T) ([]string, error) {
 	// Create test input files.
 	testFileDir := t.TempDir()
+
 	tfRand := testingh.TestFile{BufferSize: int64(1e1), FileName: "test_binary", FileSize: int64(1e6), Reader: &rand.Reader}
 	err := testingh.CreateTestFile(t, testFileDir, &tfRand)
 	if err != nil {
 		t.Errorf("Error creating binary file: %+v", err)
 	}
+
 	sr := io.Reader(&testingh.StringReader{Data: []byte("1234567890")})
 	tfStr := testingh.TestFile{BufferSize: int64(1e1), FileName: "test_string", FileSize: int64(1e6), Reader: &sr}
 	err = testingh.CreateTestFile(t, testFileDir, &tfStr)
 	if err != nil {
 		t.Errorf("Error creating string file: %+v", err)
 	}
+
 	testFilePaths := []string{tfRand.FilePath, tfStr.FilePath}
 	return testFilePaths, nil
 }
