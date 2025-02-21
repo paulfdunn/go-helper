@@ -1,8 +1,8 @@
-module github.com/paulfdunn/go-helper/archiveh
+module github.com/paulfdunn/go-helper/archiveh/v2
 
 go 1.21.8
 
 require (
-	github.com/paulfdunn/go-helper/cryptoh v1.10.2
-	github.com/paulfdunn/go-helper/testingh v1.10.2
+	github.com/paulfdunn/go-helper/cryptoh/v2 v2.0.1
+	github.com/paulfdunn/go-helper/testingh/v2 v2.0.1
 )
