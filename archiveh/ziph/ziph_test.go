@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/paulfdunn/go-helper/cryptoh"
-	"github.com/paulfdunn/go-helper/testingh"
+	"github.com/paulfdunn/go-helper/cryptoh/v2"
+	"github.com/paulfdunn/go-helper/testingh/v2"
 )
 
 func TestCancels(t *testing.T) {

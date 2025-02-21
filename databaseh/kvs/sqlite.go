@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/paulfdunn/go-helper/databaseh"
-	"github.com/paulfdunn/go-helper/osh/runtimeh"
+	"github.com/paulfdunn/go-helper/databaseh/v2"
+	"github.com/paulfdunn/go-helper/osh/v2/runtimeh"
 )
 
 // KVS is an instance for key/value storage.

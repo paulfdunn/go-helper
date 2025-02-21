@@ -5,7 +5,7 @@ package kvs
 import (
 	"encoding/json"
 
-	"github.com/paulfdunn/go-helper/osh/runtimeh"
+	"github.com/paulfdunn/go-helper/osh/v2/runtimeh"
 )
 
 // Deserialize deserializes an object from the KVS.

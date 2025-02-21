@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/paulfdunn/go-helper/osh/runtimeh"
+	"github.com/paulfdunn/go-helper/osh/v2/runtimeh"
 )
 
 const (

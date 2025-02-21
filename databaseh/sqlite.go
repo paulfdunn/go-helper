@@ -4,7 +4,7 @@ package databaseh
 import (
 	"database/sql"
 
-	"github.com/paulfdunn/go-helper/osh/runtimeh"
+	"github.com/paulfdunn/go-helper/osh/v2/runtimeh"
 
 	_ "github.com/mattn/go-sqlite3"
 )

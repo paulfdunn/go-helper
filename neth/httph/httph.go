@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/paulfdunn/go-helper/osh/runtimeh"
+	"github.com/paulfdunn/go-helper/osh/v2/runtimeh"
 )
 
 // Header key/value pairs are set when calling CollectURL.
