@@ -4,7 +4,7 @@
 # For packages with dependencies, the tip of master and the tag will
 # be the same code, but the tip will have the updates for packages with
 # dependencies.
-VERSION="v2.0.4"
+VERSION="v2.0.5"
 
 git add -A
 git commit -m "{$1}"
@@ -24,16 +24,16 @@ git tag testingh/"${VERSION}"
 git push origin --tags
 
 cd archiveh
-go get -u github.com/paulfdunn/go-helper/cryptoh@"${VERSION}"
-go get -u github.com/paulfdunn/go-helper/testingh@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/cryptoh/v2@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/testingh/v2@"${VERSION}"
 cd ../
 
 cd databaseh
-go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/osh/v2@"${VERSION}"
 cd ../
 
 cd neth
-go get -u github.com/paulfdunn/go-helper/osh@"${VERSION}"
+go get -u github.com/paulfdunn/go-helper/osh/v2@"${VERSION}"
 cd ../
 
 git add -A
@@ -45,13 +45,13 @@ git tag neth/"${VERSION}"
 git push origin --tags
 
 echo "\n\nUse the below to update modules"
-echo "go get -u github.com/paulfdunn/go-helper/archiveh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/cryptoh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/databaseh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/encodingh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/logh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/mathh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/neth@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/osh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/slicesh@${VERSION}; go mod tidy"
-echo "go get -u github.com/paulfdunn/go-helper/testingh@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/archiveh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/cryptoh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/databaseh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/encodingh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/logh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/mathh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/neth/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/osh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/slicesh/v2@${VERSION}; go mod tidy"
+echo "go get -u github.com/paulfdunn/go-helper/testingh/v2@${VERSION}; go mod tidy"
