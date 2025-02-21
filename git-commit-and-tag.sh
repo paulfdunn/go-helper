@@ -1,10 +1,10 @@
 #!/bin/bash
-# Update VERSION then run to update update the repo (local and remote)
+# Update VERSION then run to update the repo (local and remote)
 # with the tags. Accepts a quotes string for the commit message.
 # For packages with dependencies, the tip of master and the tag will
 # be the same code, but the tip will have the updates for packages with
 # dependencies.
-VERSION="v1.10.2"
+VERSION="v2.0.0"
 
 git add -A
 git commit -m "{$1}"

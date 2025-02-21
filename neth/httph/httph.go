@@ -17,6 +17,12 @@ import (
 	"github.com/paulfdunn/go-helper/osh/runtimeh"
 )
 
+// Header key/value pairs are set when calling CollectURL.
+type Header struct {
+	Key   string
+	Value string
+}
+
 // BodyUnmarshal - Unmarshals a request body (JSON) into an object. On any error the header
 // is written with the appropriate http.Status; callers should not write header status.
 func BodyUnmarshal(w http.ResponseWriter, r *http.Request, obj interface{}) error {
@@ -49,7 +55,7 @@ type URLCollectionData struct {
 
 // CollectURL - Pass in a URL, request timeout, HTTP method to use, and get back
 // the body of the request. HTTP method MUST be one of: [MethodGet, MethodHead]
-func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *http.Response, error) {
+func CollectURL(urlIn string, timeout time.Duration, method string, headers []Header) ([]byte, *http.Response, error) {
 	var req *http.Request
 	u, err := url.Parse(urlIn)
 	if err != nil {
@@ -70,6 +76,9 @@ func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *ht
 		return nil, nil, runtimeh.SourceInfoError("Error creating http.Request", reqErr)
 	}
 	req.Header.Set("Connection", "close")
+	for _, hdr := range headers {
+		req.Header.Set(hdr.Key, hdr.Value)
+	}
 	req.Close = true
 
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -99,7 +108,7 @@ func CollectURL(urlIn string, timeout time.Duration, method string) ([]byte, *ht
 // CollectURLs - Pass in a slice of URLs, request timeout, HTTP method to use, and
 // get back a slice of URLCollectionData with results.
 // The URLs are processed in parallel using threads number of parallel requests.
-func CollectURLs(urls []string, timeout time.Duration, method string, threads int) []URLCollectionData {
+func CollectURLs(urls []string, timeout time.Duration, method string, threads int, headers []Header) []URLCollectionData {
 	// Channel to feed work to the go routines
 	tasks := make(chan string, threads)
 	// Channel to return data from the workers.
@@ -113,7 +122,7 @@ func CollectURLs(urls []string, timeout time.Duration, method string, threads in
 		wg.Add(1)
 		go func(sendResult chan URLCollectionData) {
 			for url := range tasks {
-				b, resp, e := CollectURL(url, timeout, method)
+				b, resp, e := CollectURL(url, timeout, method, headers)
 				sendResult <- URLCollectionData{url, b, resp, e}
 			}
 			wg.Done()
