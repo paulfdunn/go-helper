@@ -1,0 +1,4 @@
+github.com/paulfdunn/go-helper/cryptoh/v2 v2.0.2/go.mod h1:Ud7WyiZT57mkHNiFaLuewEvmyau7heYUkC3hGoZaQpY=
+github.com/paulfdunn/go-helper/osh/v2 v2.0.1/go.mod h1:Uw/v+evgHIrCkOA/pyZit2muHyOFRLVGGrud+in8mVY=
+github.com/paulfdunn/go-helper/osh/v2 v2.0.2/go.mod h1:Uw/v+evgHIrCkOA/pyZit2muHyOFRLVGGrud+in8mVY=
+github.com/paulfdunn/go-helper/testingh/v2 v2.0.2/go.mod h1:m2/Wy/jbXogT9M0riKz2n6x7UOW5lCWK1gn4mBLy/cU=
